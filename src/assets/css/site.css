@@ -45,9 +45,9 @@ h1,h2,h3{font-family:var(--display);letter-spacing:-.035em;line-height:1;margin:
 .nav .btn{min-height:0;padding:10px 18px;font-size:15px}
 
 /* ---------- hero ---------- */
-.hero{position:relative;overflow:hidden;min-height:820px;cursor:crosshair}
+.hero{position:relative;overflow:clip visible;min-height:820px;cursor:crosshair}   /* glow may spill up behind the menu instead of being cut off */
 .hero-glow,.hero-ring{position:absolute;left:0;top:0;border-radius:50%;pointer-events:none}
-.hero-glow{width:460px;height:460px;margin:-230px 0 0 -230px;background:var(--green);filter:blur(80px);opacity:.5;transform:translate(var(--cx,72vw),var(--cy,380px));transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+.hero-glow{width:720px;height:720px;margin:-360px 0 0 -360px;background:radial-gradient(circle closest-side,rgba(34,173,114,.55),rgba(34,173,114,.28) 45%,rgba(34,173,114,0));transform:translate(var(--cx,72vw),var(--cy,380px));transition:transform .9s cubic-bezier(.2,.8,.2,1)}
 .hero-ring{width:46px;height:46px;margin:-23px 0 0 -23px;border:2px solid var(--ink);transform:translate(var(--cx,-100px),var(--cy,-100px));transition:transform .18s cubic-bezier(.2,.8,.2,1);z-index:5}
 .hero-decor{position:absolute;inset:0;pointer-events:none}
 .par{position:absolute;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
@@ -64,7 +64,7 @@ h1,h2,h3{font-family:var(--display);letter-spacing:-.035em;line-height:1;margin:
 @media (max-width:900px){.hero{min-height:0}.hero .par{display:none}}
 
 /* ---------- client strip ---------- */
-.clients{overflow:hidden;padding:26px 0;background:var(--ink);color:#fff}
+.clients{position:relative;z-index:2;overflow:hidden;padding:26px 0;background:var(--ink);color:#fff}
 .clients h2{font-size:13px;font-family:var(--body);letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:#B5B5B5;text-align:center;margin-bottom:18px}
 .marquee{display:flex;width:max-content;gap:56px;align-items:center;animation:marquee 34s linear infinite}
 .clients:hover .marquee{animation-play-state:paused}
