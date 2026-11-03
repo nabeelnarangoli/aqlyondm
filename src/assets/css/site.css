@@ -239,7 +239,7 @@ h1,h2,h3{font-family:var(--display);letter-spacing:-.035em;line-height:1;margin:
 
 /* ---------- animations ---------- */
 @keyframes rise{from{transform:translateY(105%)}to{transform:none}}
-.rise-wrap{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.06em}
+.rise-wrap{display:inline-block;overflow:hidden;vertical-align:top;padding:.3em .12em .34em;margin:-.3em -.12em -.34em}   /* room for the waving letters and descenders, so nothing is clipped */
 .rise{display:inline-block;animation:rise 1.1s cubic-bezier(.2,.8,.2,1) both}
 @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
 .fade-up{animation:fadeUp 1s cubic-bezier(.2,.8,.2,1) both}
