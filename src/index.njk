@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.njk
 permalink: /
+eventsModule: true
 ---
 {% set h = home.hero %}
 <!-- ============ HERO ============ -->
@@ -127,13 +128,16 @@ permalink: /
 </section>
 {% endif %}
 
-<!-- ============ EVENTS ============ -->
+<!-- ============ UPCOMING EVENTS (event manager) ============ -->
+{% set hideEmpty = true %}{% include "partials/upcoming.njk" %}
+
+<!-- ============ EVENT GALLERY (website content) ============ -->
 {% if collections.events.length %}
-<section class="section" id="events">
+<section class="section" id="gallery">
   <div class="wrap">
     <div class="section-head reveal">
       <h2>{{ home.events_heading }}</h2>
-      <a class="link-arrow" href="/events/">All events →</a>
+      <a class="link-arrow" href="/events/#gallery">All galleries →</a>
     </div>
     <div class="events-grid">
       {% for ev in collections.events | limit(5) %}{% include "partials/event-card.njk" %}{% endfor %}

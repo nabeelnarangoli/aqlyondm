@@ -1,11 +1,38 @@
 [build]
   command = "npm run build"
   publish = "_site"
+  functions = "netlify/functions"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Event manager (registrations, badges, check-in). Website content stays at /admin.
+[[redirects]]
+  from = "/manage"
+  to = "/manage.html"
+  status = 200
+
+# Helper links for event check-in and WhatsApp lists
+[[redirects]]
+  from = "/checkin"
+  to = "/checkin.html"
+  status = 200
+
+[[redirects]]
+  from = "/send"
+  to = "/send.html"
+  status = 200
 
 [[headers]]
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/manage*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "same-origin"

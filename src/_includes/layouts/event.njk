@@ -2,7 +2,7 @@
 layout: layouts/base.njk
 ---
 <section class="wrap page-head">
-  <p class="crumbs"><a href="/">Home</a> / <a href="/events/">Events</a></p>
+  <p class="crumbs"><a href="/">Home</a> / <a href="/events/#gallery">Event gallery</a></p>
   <p class="kicker" style="margin-bottom:22px">{% if location %}{{ location }} · {% endif %}{{ page.date | readableDate }}{% if client %} · For {{ client }}{% endif %}</p>
   <h1 style="font-size:clamp(40px,7vw,100px)">{{ title }}</h1>
   {% if summary %}<p>{{ summary }}</p>{% endif %}

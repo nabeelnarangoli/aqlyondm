@@ -15,6 +15,23 @@ The aqlyondm.com website, built with [Eleventy](https://www.11ty.dev/). It inclu
 
 Every save in `/admin` commits to the **`main`** branch on GitHub. Netlify then rebuilds the live site, which takes about a minute.
 
+## Events with registration (/manage)
+
+Upcoming events, registrations, badges and check-in use the same event module as the Aqlyon Career Discovery Centre site. Manage them at **`/manage`**, which has its own password and is separate from `/admin`.
+
+- **Create events:** name, summary, details, cover photo, date and time zone, in person (location and map link) or online (private joining link), free or paid, and a seat limit.
+- **Registration form builder:** name, email and mobile are always asked. WhatsApp and country are on by default; education level and student/parent can be switched on. You can add any question type (choices, dropdowns, grids, ratings, file upload and more) or a ready-made question such as company name or job title.
+- **Registrations:** search, approve or reject paid registrations, open WhatsApp to an attendee, import from Excel, and download to Excel.
+- **Badges and check-in:** every attendee gets a QR badge. Scan it at the door from `/manage`, or send helpers a private `/checkin` link that needs no password.
+- **WhatsApp lists, event reports and calendar invitations:** calendar invitations use an Apps Script mailer on a Gmail account; connect it from Event manager → Calendar invitations.
+- **Event pages:** each event has a shareable page at `/events/<event-name>` with link previews. Upcoming events show on the home page (the section is hidden when there are none) and on `/events/`.
+
+Event photo galleries from `/admin` now live at `/gallery/<event-name>/` and are listed on `/events/` below the upcoming events.
+
+**One-time setup:** in Netlify, go to **Site configuration → Environment variables**, add `ADMIN_PASSWORD` (a long password for `/manage`), then redeploy. Event data is kept in Netlify Blobs, so there's no database to set up.
+
+**Test it on your own computer:** run `npm run build`, then `ADMIN_PASSWORD=test123 npm run dev`, and open http://localhost:8888/manage. Test data is saved in `.data/`.
+
 ## Branches
 
 - **`staging`**: all code and design changes land here first and get a Netlify preview.

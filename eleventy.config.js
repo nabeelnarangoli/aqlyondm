@@ -3,6 +3,9 @@ export default function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/uploads");
   eleventyConfig.addPassthroughCopy("src/admin");
   eleventyConfig.ignores.add("src/admin/**");
+  // Event module front end (event pages, badges, /manage, check-in): copied as-is to the site root
+  eleventyConfig.addPassthroughCopy({ "src/ev-static": "/" });
+  eleventyConfig.ignores.add("src/ev-static/**");
   eleventyConfig.addPassthroughCopy({ "src/assets/img/favicon.png": "favicon.png" });
 
   const notDraft = (item) => !item.data.draft;

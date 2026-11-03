@@ -7,9 +7,16 @@
   "scripts": {
     "start": "eleventy --serve",
     "build": "eleventy",
-    "import:wordpress": "node scripts/import-wordpress.mjs"
+    "import:wordpress": "node scripts/import-wordpress.mjs",
+    "dev": "node scripts/dev-server.mjs"
   },
   "devDependencies": {
     "@11ty/eleventy": "3.1.2"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^11.1.4"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

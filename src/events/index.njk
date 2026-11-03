@@ -1,21 +1,31 @@
 ---
 layout: layouts/base.njk
 title: Events
-description: Event coverage, live content and recap films by Aqlyon.
+description: Upcoming workshops and events by Aqlyon Digital Marketing, plus photo galleries from events we've covered.
 permalink: /events/
+eventsModule: true
 ---
 <section class="wrap page-head">
   <p class="crumbs"><a href="/">Home</a> / Events</p>
-  <h1>Events we've<br><span style="color:var(--green-hi)">powered.</span></h1>
-  <p>{{ home.events_intro }}</p>
+  <h1>Events we<br><span style="color:var(--green-hi)">make happen.</span></h1>
+  <p>Join our upcoming workshops and sessions, or browse photos from events we've powered.</p>
 </section>
-<section class="wrap" style="padding-bottom:40px">
-  {% if collections.events.length %}
-  <div class="events-grid">
-    {% for ev in collections.events %}{% include "partials/event-card.njk" %}{% endfor %}
+
+{% set hideEmpty = false %}{% include "partials/upcoming.njk" %}
+
+<section class="section" id="gallery" style="padding-bottom:40px">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>{{ home.events_heading }}</h2>
+      <p>{{ home.events_intro }}</p>
+    </div>
+    {% if collections.events.length %}
+    <div class="events-grid">
+      {% for ev in collections.events %}{% include "partials/event-card.njk" %}{% endfor %}
+    </div>
+    {% else %}
+    <p class="empty">Event galleries will appear here soon.</p>
+    {% endif %}
   </div>
-  {% else %}
-  <p class="empty">Event galleries will appear here soon.</p>
-  {% endif %}
 </section>
 {% include "partials/contact.njk" %}

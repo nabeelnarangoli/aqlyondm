@@ -85,11 +85,11 @@ collections:
   - name: events
     label: Event photos
     label_singular: Event
-    description: Each event gets its own photo gallery page under /events. The newest five also appear on the home page.
+    description: Photo galleries of events you have covered. Each event gets its own page under /gallery; the newest five also appear on the home page. (Upcoming events with registration are managed at /manage.)
     folder: src/events
     create: true
     slug: "{{slug}}"
-    preview_path: "events/{{slug}}/"
+    preview_path: "gallery/{{slug}}/"
     summary: "{{title}} — {{date | date('DD MMM YYYY')}}"
     sortable_fields: [date, title]
     fields:

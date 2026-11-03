@@ -1,0 +1,128 @@
+/* Participant badge page (/badge/<token>) and admin preview (/badge/preview).
+   The badge keeps the printed size's proportions; everything inside is sized in cqw (% of badge width),
+   so each template scales from an ID card to A6. --c is the event's badge colour. */
+.bdgpage{background:var(--mint);min-height:100vh;margin:0;font-family:var(--body);color:var(--ink)}
+.bdgpage.pv{background:#E9EDF5;min-height:0}
+.bdgwrap{max-width:560px;margin:0 auto;padding:18px 16px 40px}
+.pv .bdgwrap{padding:14px}
+.bdgtop{margin:0 0 14px;text-align:center}
+.bdgtop a{display:inline-flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none;font-size:15px}
+.bdgtop img{border-radius:8px}
+.bstage{display:flex;justify-content:center}
+
+.bdg{--c:#0D2B22;--ink2:#14201B;--soft:color-mix(in srgb,var(--c) 10%,#fff);
+ position:relative;container-type:inline-size;width:100%;aspect-ratio:var(--ar,.709);
+ display:flex;flex-direction:column;background:#fff;color:var(--ink2);border-radius:5cqw;overflow:hidden;
+ box-shadow:0 18px 40px -22px rgba(13,43,34,.45);font-family:var(--body)}
+/* the box around the badge is a size container too, so the badge's own corner radius (in cqw) follows the badge width, not the window */
+.bdgbox{container-type:inline-size;width:min(100%,380px)}
+.bdgbox.sz-card{width:min(100%,330px)}
+.bdgbox.sz-tag{width:min(100%,540px)}
+.bdg p,.bdg h1,.bdg h2{margin:0}
+.bhead{position:relative;display:flex;flex-direction:column;gap:1.2cqw;padding:6cqw 7cqw 5cqw}
+.borg{display:flex;align-items:center;gap:2.6cqw;margin-bottom:2cqw;min-height:7cqw}
+.blogo{height:9cqw;width:auto;max-width:34cqw;object-fit:contain;border-radius:1.4cqw}
+.blogo.aq{height:7cqw}
+.borgn{font-size:3.6cqw;font-weight:600;line-height:1.2}
+.bkick{font-size:3.1cqw;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.btitle{font-family:var(--disp);font-weight:800;font-size:7.4cqw;line-height:1.08;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.bwhen{font-size:3.9cqw;line-height:1.35}.bwhen b{font-weight:700}
+.bplace{font-size:3.6cqw;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bmain{flex:1;min-height:0;display:flex;flex-direction:column;padding:4cqw 7cqw 5cqw}
+.bwho{display:flex;flex-direction:column;gap:1cqw}
+.blbl{font-size:3cqw;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.7}
+.bname{font-family:var(--disp);font-weight:800;font-size:8.4cqw;line-height:1.05;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bchips{display:flex;gap:2cqw;flex-wrap:wrap;margin-top:1.4cqw}
+.bchip{font-size:3.5cqw;font-weight:700;border-radius:99px;padding:1.1cqw 3.4cqw;background:var(--soft);color:var(--ink2)}
+.bchip.par{background:#FFF3B0}.bchip.adm{background:var(--c);color:#fff}
+.bqr{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2cqw;padding-top:3cqw}
+.qrbox{height:100%;max-height:56cqw;aspect-ratio:1;background:#fff;border:.6cqw solid #DDE5E0;border-radius:4cqw;padding:2cqw;display:grid;place-items:center}
+.qrbox svg{width:100%;height:100%;display:block}
+.qrbox.off{background:#F3F6F4;font-size:14cqw;color:#6B7B74}
+.bref{font-size:3.9cqw}.bref b{font-weight:800}
+.bfoot{display:flex;align-items:center;justify-content:center;gap:1.6cqw;font-size:2.7cqw;font-weight:600;opacity:.75;padding:0 0 3.4cqw}
+.bfoot .blogo.aq{height:4cqw}
+
+/* Classic: dark header, ticket cut, white body */
+.t-classic .bhead{background:var(--c);color:#fff}
+.t-classic .bkick{color:#FFE24A}
+.t-classic .bwhen span,.t-classic .bplace{color:color-mix(in srgb,#fff 78%,var(--c))}
+.bcut{position:relative;height:0;margin:0}
+.bcut .ln{position:absolute;left:6cqw;right:6cqw;top:-.4cqw;height:0;border-top:.8cqw dashed color-mix(in srgb,var(--c) 22%,#fff)}
+.bcut .dot{position:absolute;top:-4cqw;width:8cqw;height:8cqw;border-radius:50%;background:#E3F3EA}
+.bcut .dot.l{left:-4cqw}.bcut .dot.r{right:-4cqw}
+
+/* Minimal: white with a colour bar and coloured title */
+.t-minimal .bbar{height:2.6cqw;background:var(--c);flex:none}
+.t-minimal .bkick{color:var(--c)}
+.t-minimal .btitle{color:var(--c)}
+.t-minimal .bmain{border-top:.5cqw solid #E6ECE8;margin:0 7cqw;padding-left:0;padding-right:0}
+.t-minimal .bwhen span,.t-minimal .bplace{color:#55665E}
+
+/* Bold: the whole badge in the colour, QR on a white tile */
+.t-bold{background:var(--c);color:#fff}
+.t-bold .bkick{color:#FFE24A}
+.t-bold .bwhen span,.t-bold .bplace{color:color-mix(in srgb,#fff 80%,var(--c))}
+.t-bold .bchip{background:color-mix(in srgb,#fff 22%,var(--c));color:#fff}.t-bold .bchip.par{background:#FFE24A;color:#14201B}.t-bold .bchip.adm{background:#fff;color:var(--c)}
+.t-bold .qrbox{border-color:#fff}
+.t-bold .bref{color:#fff}
+
+/* Conference: lanyard slot, colour band, big name, role bar at the bottom */
+.t-conference .bhead{background:var(--c);color:#fff;align-items:center;text-align:center}
+.t-conference .borg{justify-content:center}
+.t-conference .bkick{color:color-mix(in srgb,#fff 70%,var(--c))}
+.t-conference .btitle{font-size:6.2cqw}
+.t-conference .bwhen span,.t-conference .bplace{color:color-mix(in srgb,#fff 80%,var(--c))}
+.t-conference .bmain{align-items:center;text-align:center}
+.t-conference .bwho{align-items:center}
+.t-conference .blbl{display:none}
+.t-conference .bname{font-size:9.6cqw}
+.t-conference .bchips{justify-content:center}
+.t-conference .brole{flex:none;background:var(--c);color:#fff;text-align:center;font-weight:800;font-size:5.2cqw;letter-spacing:.14em;padding:3cqw 0}
+.t-conference .bfoot{padding-top:2.4cqw}
+
+/* landscape name tag: header across the top, then the name on the left and the QR code on the right */
+.bdg.sz-tag{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto minmax(0,1fr) auto auto;border-radius:3.4cqw}
+.sz-tag .bbar{grid-column:1/-1;grid-row:1}
+.sz-tag .bhead{grid-column:1/-1;grid-row:2;padding:3.4cqw 5cqw 2.6cqw;gap:.5cqw}
+.sz-tag .bcut{display:none}
+.sz-tag .bmain{display:contents}
+.sz-tag .bwho{grid-column:1;grid-row:3;align-self:center;padding:2cqw 3cqw 2cqw 5cqw}
+.sz-tag .bqr{grid-column:2;grid-row:3;padding:2cqw 5cqw 2cqw 0;gap:.8cqw;min-height:0}
+.sz-tag .bqr .qrbox{max-height:26cqw;border-radius:2.4cqw;padding:1cqw;border-width:.4cqw}
+.sz-tag .btitle{font-size:4.4cqw;-webkit-line-clamp:1}.sz-tag .bwhen,.sz-tag .bplace{font-size:2.5cqw;-webkit-line-clamp:1}.sz-tag .bkick,.sz-tag .blbl{font-size:2.1cqw}
+.sz-tag .borg{margin-bottom:.4cqw;min-height:0}.sz-tag .blogo{height:5cqw}.sz-tag .borgn{font-size:2.5cqw}
+.sz-tag .bname{font-size:7cqw}.sz-tag .bchip{font-size:2.4cqw;padding:.7cqw 2.2cqw}.sz-tag .bref{font-size:2.4cqw}
+.sz-tag .brole{grid-column:1/-1;grid-row:4;font-size:3cqw;padding:1.4cqw 0}
+.sz-tag .bfoot{grid-column:1/-1;grid-row:5;font-size:2cqw;padding:1cqw 0 1.4cqw}.sz-tag .bfoot .blogo.aq{height:3cqw}
+.sz-tag.t-conference .bhead{align-items:flex-start;text-align:left}.sz-tag.t-conference .borg{justify-content:flex-start}
+.sz-tag.t-conference .bwho{align-items:flex-start;text-align:left}
+.sz-tag.t-minimal .bmain{border:0;margin:0}
+
+/* page bits around the badge */
+.stamp{display:block;width:max-content;margin:14px auto 0;background:var(--green);color:#fff;font-weight:700;border-radius:99px;padding:6px 14px;font-size:14px}
+.bdghint{text-align:center;color:var(--slate);font-size:14px;margin:12px 0 0}
+.bdgwarn{max-width:420px;margin:14px auto 0;background:#FFF8E3;border:1px solid #E9B949;border-radius:14px;padding:10px 12px;font-size:14px;line-height:1.45}
+.bdgwarn.bad{background:#FDECEC;border-color:#E7A1A1}
+.bdgbtns{display:flex;gap:10px;justify-content:center;margin:16px 0 6px;flex-wrap:wrap}
+.bdgbtns .btn{min-width:150px;justify-content:center}
+.bdgnote{text-align:center;color:var(--slate);font-size:14px;margin:8px 0 0}
+.bdgnote a{color:var(--ink)}
+.bdgmsg{background:#fff;border-radius:24px;padding:28px;text-align:center}
+@media print{
+ .bdgpage{background:#fff}.bdgwrap{padding:0;max-width:none}.bdgtop,.bdgbtns,.bdgnote,.bdghint,.stamp,.bdgwarn{display:none}
+ .bdg{box-shadow:none;border-radius:0}
+ .bdg,.bdg *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+/* the name and header never shrink; the QR code takes whatever space is left */
+.bhead,.bwho,.bcut,.brole,.bfoot,.bbar{flex:none}
+.bqr{display:grid;grid-template-rows:minmax(0,1fr) auto;justify-items:center;align-content:center}
+.bqr .qrbox{height:100%;max-height:56cqw;min-height:0;align-self:center}
+/* lanyard hole: empty space at the top so the printer can punch the hole without cutting anything (every template; not on the landscape name tag) */
+.bhole{flex:none;height:9cqw}
+/* about 9–10 mm on the printed badge whatever its width */
+.sz-card .bhole{height:17cqw}.sz-a7 .bhole{height:13cqw}.sz-a6 .bhole,.sz-4x6 .bhole{height:9cqw}
+.t-classic .bhole,.t-conference .bhole{background:var(--c)}
+.holed.t-classic .bhead,.holed.t-conference .bhead,.holed.t-bold .bhead{padding-top:3cqw}
+.sz-tag .bhole{display:none}
+.sz-tag.holed .bhead{padding-top:3.4cqw}

@@ -1,0 +1,12 @@
+{# Upcoming events from the event manager (/manage). Filled in by /site/events.js from /api/events. #}
+<section class="section upcoming" id="events" aria-labelledby="upcoming-h"{% if hideEmpty %} data-hide-empty{% endif %}>
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2 id="upcoming-h">{{ home.upcoming_heading or "Upcoming events" }}</h2>
+      <p>{{ home.upcoming_intro or "Workshops, launches and live sessions. Register in a minute." }}</p>
+    </div>
+    <div class="evgrid" aria-live="polite"><div class="evskel"></div><div class="evskel"></div><div class="evskel"></div></div>
+    <p class="evnone" hidden>New events are announced here soon. Want to talk to us now? <a href="/#contact">Request a call back</a>.</p>
+    <details class="evpast" hidden><summary>Past events</summary><div class="evgrid small"></div></details>
+  </div>
+</section>

@@ -10,6 +10,8 @@
   --body:"Inter",system-ui,sans-serif;
   --gutter:clamp(16px,3vw,32px);
   --radius:30px;
+  /* names used by the event module's stylesheet (/site/events.css) */
+  --green-d:#0B7A44; --mint:#E3F5EC; --line:#DEDFD8; --slate:#4A4D46; --disp:var(--display); --r-lg:30px; --r-md:20px; --wrap:1320px;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -285,3 +287,8 @@ h1,h2,h3{font-family:var(--display);letter-spacing:-.035em;line-height:1;margin:
   .reveal{animation:fadeUp linear both;animation-timeline:view();animation-range:entry 0% cover 25%}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+
+/* ---------- upcoming events (event module cards) ---------- */
+.upcoming .evnone{margin:0}
+.upcoming .evc h3{font-family:var(--display);letter-spacing:-.02em}
+.upcoming .evpast summary{font-family:var(--display);font-size:20px}
