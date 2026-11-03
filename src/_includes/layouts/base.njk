@@ -19,8 +19,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css">
-{% if eventsModule %}<link rel="stylesheet" href="/site/events.css">{% endif %}
+<link rel="stylesheet" href="/assets/css/site.css?v={{ build.v }}">
+{% if eventsModule %}<link rel="stylesheet" href="/site/events.css?v={{ build.v }}">{% endif %}
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":{{ site.title | dump | safe }},"url":{{ site.url | dump | safe }},"logo":{{ ('/assets/img/aqlyon-logo.png' | absoluteUrl(site.url)) | dump | safe }},"email":{{ site.email | dump | safe }},"sameAs":[{{ site.social.instagram | dump | safe }},{{ site.social.facebook | dump | safe }},{{ site.social.linkedin | dump | safe }},{{ site.social.youtube | dump | safe }}]}</script>
 </head>
 <body>
@@ -30,7 +30,7 @@
 {{ content | safe }}
 </main>
 {% include "partials/footer.njk" %}
-<script src="/assets/js/site.js" defer></script>
-{% if eventsModule %}<script src="/site/events.js" defer></script>{% endif %}
+<script src="/assets/js/site.js?v={{ build.v }}" defer></script>
+{% if eventsModule %}<script src="/site/events.js?v={{ build.v }}" defer></script>{% endif %}
 </body>
 </html>
