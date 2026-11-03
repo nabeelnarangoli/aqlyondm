@@ -55,7 +55,7 @@ const AAPI={
   const h={'content-type':'application/json'};const t=AAPI.token();if(t)h.authorization='Bearer '+t;
   let r;try{r=await fetch('/api'+path,{method,headers:h,body:body?JSON.stringify(body):undefined})}catch(e){throw new Error('Can\'t reach the server.')}
   let d={};try{d=await r.json()}catch(e){}
-  if(r.status===401&&path!=='/admin/login'){AAPI.setToken(null);loginView('Please log in again.');throw new Error('Admin login needed.')}
+  if(r.status===401&&path!=='/admin/login'){AAPI.setToken(null);if(self!==top)parent.postMessage('aqlyon-admin:logout',location.origin);loginView('Please log in again.');throw new Error('Admin login needed.')}
   if(!r.ok)throw new Error(d.error||'Something went wrong.');return d;
  }
 };

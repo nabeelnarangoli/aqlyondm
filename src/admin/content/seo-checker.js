@@ -56,6 +56,6 @@
       );
     }
   });
-  CMS.registerPreviewStyle("/admin/seo-preview.css");
+  CMS.registerPreviewStyle("/admin/content/seo-preview.css");
   CMS.registerPreviewTemplate("blog", Preview);
 })();

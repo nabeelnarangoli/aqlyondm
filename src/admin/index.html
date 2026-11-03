@@ -1,15 +1,195 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex">
-  <title>Aqlyon · Content Manager</title>
-  <link rel="icon" type="image/png" href="/favicon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="same-origin">
+<title>Admin · Aqlyon Brand Management</title>
+<link rel="icon" href="/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{--ink:#0B0B0B;--ink2:#3B3D38;--ink3:#5C5F57;--paper:#F2F3EF;--line:#E2E3DD;--green:#22AD72;--green-t:#0B7A44;--good:#1E9E62;--ok:#C9820F;--bad:#D93A3F;--display:"Space Grotesk",system-ui,sans-serif;--body:"Inter",system-ui,sans-serif;--side:248px}
+*{box-sizing:border-box}
+html,body,#app{height:100%}
+#app>.shell{height:100dvh}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+a{color:var(--green-t)}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px;border-radius:6px}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.025em;line-height:1.1;margin:0}
+button{font:inherit}
+/* login */
+.auth{min-height:100%;display:flex;align-items:center;justify-content:center;padding:20px}
+.auth .card{width:min(420px,100%);background:#fff;border-radius:24px;padding:30px;text-align:center}
+.auth form{display:grid;gap:14px;text-align:left;margin-top:20px}
+label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px}
+input[type=password]{font:inherit;font-size:16px;padding:12px 14px;border-radius:12px;border:1px solid #D2D3CC}
+.keep{flex-direction:row;align-items:center;gap:8px;font-weight:500}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 20px;border-radius:999px;border:0;background:var(--ink);color:#fff;font-weight:600;cursor:pointer;text-decoration:none}
+.btn[disabled]{opacity:.55}
+.err{color:var(--bad);font-weight:600;min-height:1.2em;margin:0}
+/* shell */
+.shell{display:grid;grid-template-columns:var(--side) minmax(0,1fr);height:100%}
+.side{background:var(--ink);color:#fff;display:flex;flex-direction:column;padding:18px 14px;gap:4px;overflow:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 18px;font-family:var(--display);font-weight:700;font-size:17px;line-height:1.15}
+.brand img{width:34px;height:34px;border-radius:9px;background:#fff;padding:3px}
+.brand small{display:block;font:500 12px var(--body);color:#A9ACA3}
+.nav{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;font-weight:600;color:#D9DBD4;cursor:pointer;min-height:44px}
+.nav svg{width:20px;height:20px;flex:none}
+.nav:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav[aria-current=page]{background:var(--green);color:var(--ink)}
+.nav:focus-visible{outline:3px solid #fff;outline-offset:1px}
+.side .sp{flex:1}
+.side .sub{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#8C8F86;padding:14px 12px 4px}
+.view{position:relative;height:100%;overflow:hidden}
+.view iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--paper)}
+.home{position:absolute;inset:0;overflow:auto}
+.home .in{max-width:1100px;margin:0 auto;padding:36px 28px 60px}
+.home h1{font-size:36px}
+.home .lead{color:var(--ink2);margin:6px 0 26px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.card2{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;background:#fff;border-radius:24px;padding:24px;cursor:pointer;border:2px solid transparent;transition:transform .2s,border-color .2s,box-shadow .2s;min-height:220px}
+.card2:hover{transform:translateY(-3px);border-color:var(--green);box-shadow:0 22px 40px -28px rgba(13,43,34,.5)}
+.card2:focus-visible{outline:3px solid var(--ink)}
+.card2 .ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.card2 .ic svg{width:24px;height:24px}
+.card2 h2{font-size:22px}
+.card2 p{margin:0;color:var(--ink2);font-size:14.5px}
+.card2 .stat{margin-top:auto;padding-top:10px;border-top:1px solid var(--line);font-size:14px;color:var(--ink3)}
+.card2 .stat b{font-family:var(--display);font-size:22px;color:var(--ink);margin-right:4px}
+.quick{margin-top:30px}
+.quick h2{font-size:20px;margin-bottom:12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-weight:600;font-size:14px;cursor:pointer;min-height:42px}
+.chip:hover{border-color:var(--green)}
+.chip:focus-visible{outline:3px solid var(--ink)}
+.note{margin-top:26px;color:var(--ink3);font-size:13.5px}
+@media (max-width:820px){
+  .shell{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}
+  .side{flex-direction:row;align-items:center;padding:8px 10px;gap:4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+  .brand{padding:0 6px 0 2px}.brand span,.side .sub,.side .sp{display:none}
+  .nav{padding:8px 10px;gap:8px;white-space:nowrap;flex:none;min-height:40px}
+  .brand img{width:30px;height:30px}
+  .nav span.lbl-long{display:none}
+  .home .in{padding:24px 16px 50px}.home h1{font-size:28px}
+}
+@media (min-width:821px){.nav .lbl-short{display:none}}
+</style>
 </head>
 <body>
-  <script src="https://unpkg.com/decap-cms@3.17.0/dist/decap-cms.js"></script>
-  <script src="/assets/js/seo-checks.js"></script>
-  <script src="/admin/seo-checker.js"></script>
+<div id="app"></div>
+<script>
+/* Aqlyon admin home: one login for the event manager, the SEO dashboard and the website content editor.
+   Each tool opens inside this page; they share the login saved under "dm-admin". */
+(function () {
+  "use strict";
+  // Old content-editor links (/admin/#/collections/...) now live at /admin/content/
+  var legacy = function () { if (/^#\/(collections|media|workflow)/.test(location.hash)) { location.replace("/admin/content/" + location.hash); return true; } };
+  if (legacy()) return;
+  window.addEventListener("hashchange", legacy);
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
+  var app = $("#app"), KEY = "dm-admin";
+  var tok = {
+    get: function () { try { return sessionStorage.getItem(KEY) || localStorage.getItem(KEY); } catch (e) { return null; } },
+    set: function (t, keep) { try { sessionStorage.removeItem(KEY); localStorage.removeItem(KEY); if (t) (keep ? localStorage : sessionStorage).setItem(KEY, t); } catch (e) {} },
+  };
+  var ICON = {
+    home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+    events: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+    seo: '<circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5l-4.8-4.8M8.5 12.5l2-2 1.5 1.5 2.5-3"/>',
+    content: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',
+    site: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+    out: '<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/>',
+  };
+  var svg = function (k) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON[k] + "</svg>"; };
+  var TOOLS = {
+    events: { label: "Events", long: "Events & registrations", src: "/manage", color: "#FFE15A", desc: "Create events, manage registrations, send invitations, print badges and check people in." },
+    seo: { label: "SEO", long: "SEO & Google ranking", src: "/seo/", color: "#C9B8FF", desc: "Your site's SEO score, Google Search Console data, the AI writing assistant and the ranking plan." },
+    content: { label: "Content", long: "Website content", src: "/admin/content/", color: "#8FD3FF", desc: "Blog posts, testimonials, client logos, event photo galleries, home page text and contact details." },
+  };
+  var frames = {}, current = null;
+
+  function login(msg) {
+    app.innerHTML = '<div class="auth"><div class="card"><img src="/img/aqlyon-q.png" alt="" style="height:46px"><h1 style="font-size:28px;margin-top:10px">Aqlyon admin</h1><p style="color:var(--ink2);margin:6px 0 0">Events, SEO and website content in one place.</p>' +
+      '<form><label>Admin password<input type="password" id="pw" autocomplete="current-password" required></label><label class="keep"><input type="checkbox" id="keep" checked> Keep me signed in on this device</label><p class="err" role="alert">' + esc(msg || "") + '</p><button class="btn" type="submit">Log in</button></form></div></div>';
+    $("form").onsubmit = function (e) {
+      e.preventDefault(); var b = $("button", e.target); b.disabled = true;
+      fetch("/api/admin/login", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ password: $("#pw").value, remember: $("#keep").checked }) })
+        .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || "Wrong password."); return d; }); })
+        .then(function (d) { tok.set(d.token, $("#keep").checked); start(); })
+        .catch(function (err) { $(".err").textContent = err.message; b.disabled = false; });
+    };
+    $("#pw").focus();
+  }
+
+  function shell() {
+    var nav = function (id, label, long) { return '<button type="button" class="nav" data-go="' + id + '">' + svg(id) + '<span class="lbl-long">' + long + '</span><span class="lbl-short">' + label + "</span></button>"; };
+    app.innerHTML = '<div class="shell"><nav class="side" aria-label="Admin"><div class="brand"><img src="/img/aqlyon-q.png" alt=""><span>Aqlyon admin<small>Brand Management</small></span></div>' +
+      nav("home", "Home", "Home") + '<div class="sub">Manage</div>' + nav("events", "Events", TOOLS.events.long) + nav("seo", "SEO", TOOLS.seo.long) + nav("content", "Content", TOOLS.content.long) +
+      '<div class="sp"></div><a class="nav" href="/" target="_blank" rel="noopener">' + svg("site") + '<span class="lbl-long">View website ↗</span><span class="lbl-short">Site ↗</span></a>' +
+      '<button type="button" class="nav" id="out">' + svg("out") + '<span class="lbl-long">Log out</span><span class="lbl-short">Log out</span></button></nav>' +
+      '<main class="view" id="view"><div class="home" id="home"></div></main></div>';
+    app.addEventListener("click", function (e) { var g = e.target.closest("[data-go]"); if (g) { e.preventDefault(); go(g.getAttribute("data-go"), g.getAttribute("data-path")); } });
+    $("#out").onclick = function () { tok.set(null); frames = {}; current = null; history.replaceState(null, "", "/admin/"); login(); };
+  }
+
+  function homeView() {
+    var card = function (id) { var t = TOOLS[id]; return '<button type="button" class="card2" data-go="' + id + '"><span class="ic" style="background:' + t.color + '">' + svg(id) + "</span><h2>" + t.long + "</h2><p>" + t.desc + '</p><span class="stat" id="st-' + id + '">&nbsp;</span></button>'; };
+    var chip = function (label, path) { return '<button type="button" class="chip" data-go="content" data-path="' + path + '">' + label + "</button>"; };
+    $("#home").innerHTML = '<div class="in"><h1>Welcome back</h1><p class="lead">Everything for aqlyondm.com in one place. Pick what you want to work on.</p><div class="cards">' + card("events") + card("seo") + card("content") + "</div>" +
+      '<div class="quick"><h2>Quick actions</h2><div class="chips">' + chip("✍️ New blog post", "#/collections/blog/new") + chip("⭐ Add a testimonial", "#/collections/testimonials/new") + chip("🏷️ Add a client logo", "#/collections/clients/new") +
+      chip("📸 New event photo gallery", "#/collections/events/new") + chip("🏠 Edit home page text", "#/collections/settings/entries/home") + chip("📞 Edit contact details", "#/collections/settings/entries/site") +
+      '<button type="button" class="chip" data-go="events">📅 Create an event</button><button type="button" class="chip" data-go="seo" data-path="#ai">✨ AI blog ideas</button></div></div>' +
+      '<p class="note">Website content uses your GitHub account to save changes: the first time you open it on a device, click “Login with GitHub”. Changes there go live about a minute after you publish.</p></div>';
+    fetch("/api/events").then(function (r) { return r.json(); }).then(function (d) {
+      var up = d.upcoming || [], n = up[0];
+      $("#st-events").innerHTML = "<b>" + up.length + "</b> upcoming" + (n ? " · next: " + esc(n.title) : "");
+    }).catch(function () {});
+    fetch("/seo/report.json", { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (R) {
+      $("#st-seo").innerHTML = "<b>" + R.summary.avg + "</b>/100 average score · " + R.summary.bad + " problems to fix";
+    }).catch(function () {});
+    fetch("/seo/site.json", { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (s) {
+      $("#st-content").innerHTML = "<b>" + (s.posts || []).length + "</b> blog posts published";
+    }).catch(function () {});
+  }
+
+  function go(id, path) {
+    if (!TOOLS[id]) id = "home";
+    current = id;
+    history.replaceState(null, "", "/admin/" + (id === "home" ? "" : "#" + id));
+    Array.prototype.forEach.call(document.querySelectorAll(".nav[data-go]"), function (n) { if (n.getAttribute("data-go") === id) n.setAttribute("aria-current", "page"); else n.removeAttribute("aria-current"); });
+    $("#home").hidden = id !== "home";
+    Object.keys(frames).forEach(function (k) { frames[k].hidden = k !== id; });
+    if (id === "home") { homeView(); document.title = "Admin · Aqlyon Brand Management"; return; }
+    var t = TOOLS[id], f = frames[id];
+    if (!f) {   // each tool loads once and keeps its place while you switch
+      f = frames[id] = document.createElement("iframe");
+      f.title = t.long; f.src = t.src + (path || "");
+      $("#view").appendChild(f);
+    } else if (path) {
+      try { f.contentWindow.location.hash = path; } catch (e) { f.src = t.src + path; }
+    }
+    document.title = t.long + " · Aqlyon admin";
+    f.focus();
+  }
+
+  function start() {
+    shell();
+    var h = location.hash.slice(1);
+    go(TOOLS[h] ? h : "home");
+  }
+
+  // A tool inside the page asks for a fresh login (its session expired)
+  window.addEventListener("message", function (e) { if (e.origin === location.origin && e.data === "aqlyon-admin:logout") { tok.set(null); frames = {}; login("Please log in again."); } });
+
+  if (!tok.get()) return login();
+  // check the saved login is still valid
+  fetch("/api/seo/settings", { headers: { authorization: "Bearer " + tok.get() } }).then(function (r) {
+    if (r.status === 401) { tok.set(null); login("Please log in again."); } else start();
+  }).catch(start);
+})();
+</script>
 </body>
 </html>

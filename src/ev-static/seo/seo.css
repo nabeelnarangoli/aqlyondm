@@ -93,3 +93,5 @@ pre.md{white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:999px;font-weight:600;z-index:50}
 .toast.bad{background:var(--bad)}
 .kw{display:inline-block;padding:2px 8px;border-radius:6px;background:#EEF7F2;font-weight:600}
+.embedded .top .brand,.embedded #lo{display:none}
+.embedded .tabs{margin-left:0}

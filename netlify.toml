@@ -9,7 +9,7 @@
 [functions]
   node_bundler = "esbuild"
 
-# Event manager (registrations, badges, check-in). Website content stays at /admin.
+# Event manager (registrations, badges, check-in). Everything opens from the admin home at /admin.
 [[redirects]]
   from = "/manage"
   to = "/manage.html"
@@ -34,5 +34,16 @@
 [[headers]]
   for = "/manage*"
   [headers.values]
-    X-Frame-Options = "DENY"
+    X-Frame-Options = "SAMEORIGIN"
     Referrer-Policy = "same-origin"
+
+[[headers]]
+  for = "/seo/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "same-origin"
+
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"

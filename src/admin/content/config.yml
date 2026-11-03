@@ -1,4 +1,4 @@
-# Aqlyon content manager (Decap CMS). Open https://<your-site>/admin/ and log in with GitHub.
+# Aqlyon content manager (Decap CMS). Open https://<your-site>/admin/ (Website content) and log in with GitHub.
 # Every save is a commit to the branch below, and Netlify rebuilds the live site in about a minute.
 backend:
   name: github
@@ -11,7 +11,7 @@ backend:
     uploadMedia: "Upload “{{path}}”"
     deleteMedia: "Delete “{{path}}”"
 
-# For editing on your own computer: run `npx decap-server` and `npm start`, then open http://localhost:8080/admin/
+# For editing on your own computer: run `npx decap-server` and `npm start`, then open http://localhost:8080/admin/content/
 local_backend: true
 
 site_url: https://aqlyondm.com

@@ -26,7 +26,7 @@
     var h = { "content-type": "application/json" }, t = store.get(TOKEN); if (t) h.authorization = "Bearer " + t;
     return fetch("/api" + path, { method: opts.method || "GET", headers: h, body: opts.body ? JSON.stringify(opts.body) : undefined })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) {
-        if (r.status === 401 && path !== "/admin/login") { store.set(TOKEN, null); login("Please log in again."); throw new Error("Admin login needed."); }
+        if (r.status === 401 && path !== "/admin/login") { store.set(TOKEN, null); if (self !== top) parent.postMessage("aqlyon-admin:logout", location.origin); login("Please log in again."); throw new Error("Admin login needed."); }
         if (!r.ok) throw new Error(d.error || "Something went wrong."); return d; }); });
   }
   var fmt = function (n) { return Number(n || 0).toLocaleString("en-GB"); };
@@ -122,7 +122,7 @@
         var slug = postSlug(p.url);
         return '<div class="page"><button type="button" aria-expanded="false" data-i="' + i + '"><span class="score ' + p.grade + '">' + p.score + '</span><span><span class="u">' + esc(p.title) + '</span><br><span class="s">' + esc(p.url) + " · " + p.type + " · " + p.words + " words" + (p.keyword ? ' · keyword <span class="kw">' + esc(p.keyword) + "</span>" : "") + '</span></span><span class="pill ' + p.grade + '">' + p.checks.filter(function (c) { return c.status === "bad"; }).length + " to fix</span></button>" +
           '<div class="body" hidden>' + (p.checks.length ? p.checks.sort(function (a, b) { return (a.status === "bad" ? 0 : 1) - (b.status === "bad" ? 0 : 1); }).map(function (c) { return '<div class="issue"><span class="dot ' + c.status + '"></span><div><b>' + esc(c.text) + "</b>" + (c.fix ? "<p>" + esc(c.fix) + "</p>" : "") + "</div></div>"; }).join("") : '<p>All checks passed.</p>') +
-          '<p class="hint">' + p.passed + ' checks passed.</p><div class="row"><a class="btn ghost" href="' + esc(p.url) + '" target="_blank" rel="noopener">Open page ↗</a>' + (slug ? '<a class="btn ghost" href="/admin/#/collections/blog/entries/' + esc(slug) + '" target="_blank" rel="noopener">Edit in /admin ↗</a>' : "") +
+          '<p class="hint">' + p.passed + ' checks passed.</p><div class="row"><a class="btn ghost" href="' + esc(p.url) + '" target="_blank" rel="noopener">Open page ↗</a>' + (slug ? '<a class="btn ghost" href="/admin/content/#/collections/blog/entries/' + esc(slug) + '" target="_blank" rel="noopener">Edit in /admin ↗</a>' : "") +
           '<button class="btn green" type="button" data-improve="' + esc(p.url) + '">✨ Get AI suggestions</button></div><div class="ai-out"></div></div></div>';
       }).join("");
       $$("#pl .page>button").forEach(function (b) { b.onclick = function () { var body = b.nextElementSibling; body.hidden = !body.hidden; b.setAttribute("aria-expanded", !body.hidden); }; });
@@ -246,7 +246,7 @@
       h += (x.ideas || []).map(function (i, n) { return "<h3>" + (n + 1) + ". " + esc(i.title) + '</h3><p style="margin:0 0 6px">Keyword <span class="kw">' + esc(i.keyword) + "</span> · for " + esc(i.audience) + "</p>" + list(i.outline); }).join("");
     } else if (d.task === "draft") {
       h += "<h3>SEO fields</h3>" + ["title", "seo_title", "meta_description", "excerpt", "focus_keyword"].map(function (k) { return x[k] ? '<p class="hint" style="margin:8px 0 0">' + k.replace("_", " ") + "</p>" + copyBtn(x[k]) : ""; }).join("") +
-        '<h3>Article (Markdown)</h3><div class="row" style="margin-bottom:8px"><button type="button" class="btn" data-copy="' + esc(x.markdown) + '">Copy article</button><a class="btn ghost" href="/admin/#/collections/blog/new" target="_blank" rel="noopener">Create a new post in /admin ↗</a></div><pre class="md">' + esc(x.markdown) + "</pre>" +
+        '<h3>Article (Markdown)</h3><div class="row" style="margin-bottom:8px"><button type="button" class="btn" data-copy="' + esc(x.markdown) + '">Copy article</button><a class="btn ghost" href="/admin/content/#/collections/blog/new" target="_blank" rel="noopener">Create a new post in /admin ↗</a></div><pre class="md">' + esc(x.markdown) + "</pre>" +
         '<p class="hint">Paste the article into the Article field, fill in the SEO fields, add a cover image, then check the score on the right before publishing. Replace any [ADD FIGURE] with your own numbers.</p>';
     } else if (d.task === "meta") {
       if (x.keyword) h += '<p>Suggested keyword: <span class="kw">' + esc(x.keyword) + "</span></p>";

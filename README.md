@@ -1,8 +1,12 @@
 # Aqlyon Digital Marketing — website
 
-The aqlyondm.com website, built with [Eleventy](https://www.11ty.dev/). It includes a content manager ([Decap CMS](https://decapcms.org/)) at **`/admin`**.
+The aqlyondm.com website, built with [Eleventy](https://www.11ty.dev/). Everything is managed from one place: **`/admin`**. Log in with the admin password (`ADMIN_PASSWORD`) and use the sidebar:
 
-## What you can edit at /admin
+- **Events & registrations**: the event manager (also at `/manage`, which badge QR codes use for check-in).
+- **SEO & Google ranking**: the SEO dashboard (also at `/seo`).
+- **Website content**: the content editor ([Decap CMS](https://decapcms.org/), also at `/admin/content/`). It saves to GitHub, so the first time on each device click *Login with GitHub*.
+
+## What you can edit in Website content
 
 | Section | What it controls |
 |---|---|
@@ -44,7 +48,7 @@ Log in at **/seo** with the same `ADMIN_PASSWORD` as /manage.
 - Also generated on every deploy: `sitemap.xml`, `robots.txt`, and structured data for the business, both offices and each blog post.
 
 **Connect Google Search Console (once):**
-1. Add and verify the site in Search Console (a Domain property for `aqlyondm.com` is best). For the HTML-tag method, paste the code into /admin → Site content → Contact details → *Google Search Console verification code*, and deploy.
+1. Add and verify the site in Search Console (a Domain property for `aqlyondm.com` is best). For the HTML-tag method, paste the code into /admin → Website content → Site content → Contact details → *Google Search Console verification code*, and deploy.
 2. In Google Cloud Console, create a project and enable **Google Search Console API**.
 3. IAM & Admin → Service accounts → create one → Keys → Add key → JSON.
 4. In Search Console → Settings → Users and permissions, add the service account's email with **Restricted** permission.
