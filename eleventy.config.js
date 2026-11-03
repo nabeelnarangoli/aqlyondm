@@ -1,6 +1,7 @@
 export default function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/assets");
   eleventyConfig.addPassthroughCopy("src/uploads");
+  eleventyConfig.addPassthroughCopy("src/_redirects");   // old WordPress links → /blog/…
   eleventyConfig.addPassthroughCopy("src/admin");
   eleventyConfig.ignores.add("src/admin/**");
   // Event module front end (event pages, badges, /manage, check-in): copied as-is to the site root
