@@ -4,7 +4,7 @@
    ===================================================================== */
 const EV_TZ=[['Asia/Kolkata','India time (IST)'],['Asia/Dubai','UAE time (GST)'],['Asia/Riyadh','Saudi time (AST)'],['Asia/Qatar','Qatar time (AST)'],['Europe/London','UK time']];
 const EV_CUR=['AED','INR','USD','SAR','QAR','OMR'];
-let EVENTS=[],EVSET={whatsapp:'+971509693948',calUrl:'',calEmail:''};
+let EVENTS=[],EVSET={whatsapp:'+971509693948',defaultTz:'Asia/Dubai',calUrl:'',calEmail:''};
 const evDate=e=>{try{const d=new Date(e.start+':00');return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('en-GB',{hour:'numeric',minute:'2-digit',hour12:true})+' '+((EV_TZ.find(t=>t[0]===e.tz)||[])[1]||'').replace(/.*\((.*)\)/,'$1')}catch(x){return e.start}};
 const evLink=e=>location.origin+'/events/'+e.slug;
 const STATE_LABEL={open:['Registration open','ok'],closed:['Registration closed','no'],full:['Fully booked','no'],ended:['Ended','muted'],none:['Info only','muted']};
@@ -35,8 +35,9 @@ function renderEvents(){
  const t=e=>Date.parse(e.start+':00');const up=EVENTS.filter(e=>e.state!=='ended').sort((a,b)=>t(a)-t(b)),past=EVENTS.filter(e=>e.state==='ended').sort((a,b)=>t(b)-t(a));
  main.innerHTML=`<div class="admhead"><h1>Events</h1><button type="button" class="btn" id="newev">＋ New event</button></div>
  <div class="calbar ${EVSET.calUrl&&!EVSET.calNeedsUpdate?'on':EVSET.calNeedsUpdate?'warn':''}"><span class="calic">📅</span><div><b>Calendar invitations ${EVSET.calNeedsUpdate?'need a quick update':EVSET.calUrl?'on':'off'}</b><small>${EVSET.calNeedsUpdate?'Switch to our own invitation email (“Invitation from Aqlyon Brand Management: event name”). Takes 2 minutes.':EVSET.calUrl?`Emailed from ${esc(EVSET.calEmail||'your Google account')} as “Invitation from Aqlyon Brand Management: <i>event name</i>”, with the event attached for their calendar.`:'Connect so everyone who registers gets an invitation email with the event for their calendar.'}</small></div><button type="button" class="btn sm ${EVSET.calUrl&&!EVSET.calNeedsUpdate?'ghost':''} calsetup">${EVSET.calNeedsUpdate?'Update now':EVSET.calUrl?'Settings':'Connect'}</button></div>
- <details class="evset"><summary><b>Event settings</b> · WhatsApp for approvals: ${esc(EVSET.whatsapp)}</summary>
+ <details class="evset"><summary><b>Event settings</b> · WhatsApp for approvals: ${esc(EVSET.whatsapp)} · New events in ${esc(((EV_TZ.find(x=>x[0]===(EVSET.defaultTz||'Asia/Dubai'))||[])[1])||'UAE time (GST)')}</summary>
   <form class="mform evsetform"><div class="field"><label for="es-wa">WhatsApp number for paid registrations</label><input id="es-wa" value="${esc(EVSET.whatsapp)}" inputmode="tel"><small class="small">Visitors who register for a paid event send their details to this number for payment and approval. Include the country code.</small></div>
+  <div class="field"><label for="es-tz">Time zone for new events</label><select id="es-tz">${EV_TZ.map(([v,t])=>`<option value="${v}" ${v===(EVSET.defaultTz||'Asia/Dubai')?'selected':''}>${t}</option>`).join('')}</select><small class="small">New events start in this time zone. You can still pick a different one on each event.</small></div>
   <p class="fbsub">Common WhatsApp message</p><p class="small">Used for every event that doesn't have its own message (set one in the event's <b>WhatsApp message</b> section). It's the confirmation sent from the WhatsApp lists and the <b>Send details on WhatsApp</b> button.</p>
   <div class="wacommon" data-on="0"></div><button type="button" class="linkbtn sm wareset" data-on="0">Use the built-in message</button>
   <div class="wacommon" data-on="1"></div><button type="button" class="linkbtn sm wareset" data-on="1">Use the built-in message</button>
@@ -50,7 +51,7 @@ function renderEvents(){
  const WC=[0,1].map(o=>waEditor($(`.wacommon[data-on="${o}"]`),{value:waCommon(EVSET,!!o),online:!!o,ev:waEvent(o?sampleOn:sampleEv),person:WA_SAMPLE,id:'es-wa'+o,label:o?'For online events':'For in-person events'}));
  $$('.wareset').forEach(b=>b.onclick=()=>WC[+b.dataset.on].set(waDefault(!!+b.dataset.on)));
  $('.evsetform').onsubmit=async ev=>{ev.preventDefault();const f=ev.target;const keep=(o)=>{const v=WC[o].get();return v===waDefault(!!o).trim()?'':v};   // built-in text is stored as "use built-in"
-  try{EVSET=await AAPI.call('/admin/events/settings',{method:'PATCH',body:{whatsapp:$('#es-wa').value,waMsg:keep(0),waMsgOnline:keep(1)}});toast('Settings saved');renderEvents()}catch(err){$('.formerr',f).textContent=err.message}};
+  try{EVSET=await AAPI.call('/admin/events/settings',{method:'PATCH',body:{whatsapp:$('#es-wa').value,defaultTz:$('#es-tz').value,waMsg:keep(0),waMsgOnline:keep(1)}});toast('Settings saved');renderEvents()}catch(err){$('.formerr',f).textContent=err.message}};
  $$('[data-ev]').forEach(b=>b.onclick=async()=>{const e=EVENTS.find(x=>x.id===b.dataset.id);const a=b.dataset.ev;
   if(a==='edit')return eventForm(e);
   if(a==='regs')return regsView(e);
@@ -68,7 +69,7 @@ async function prepImage(file){
 }
 
 function eventForm(e){
- const isNew=!e;e=e||{tz:'Asia/Dubai',mode:'offline',regMode:'form',regOpen:true,published:true,currency:'AED',maxSeats:1,paid:false};
+ const isNew=!e;e=e||{tz:EVSET.defaultTz||'Asia/Dubai',mode:'offline',regMode:'form',regOpen:true,published:true,currency:'AED',maxSeats:1,paid:false};
  const r=(n,v,cur,label)=>`<label class="radio"><input type="radio" name="${n}" value="${v}" ${cur===v?'checked':''}><span>${label}</span></label>`;
  modal(`<h2>${isNew?'New event':'Edit event'}</h2><form class="mform evform">
  <div class="field"><label for="ef-title">Event name *</label><input id="ef-title" maxlength="120" required value="${esc(e.title||'')}"></div>

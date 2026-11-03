@@ -96,7 +96,7 @@ function publicEvent(e, list) {
 
 // Calendar invitations: our own email from the academy Gmail account (Apps Script mailer), with the
 // event attached as a calendar invitation. Subject: "Invitation from Aqlyon Brand Management: <event name>".
-const adminSettings = (s) => ({ whatsapp: s.whatsapp || '+971509693948', waMsg: s.waMsg || '', waMsgOnline: s.waMsgOnline || '', calUrl: s.calUrl || '', calEmail: s.calEmail || '', calSecret: s.calSecret || '', calNeedsUpdate: !!s.calUrl && !s.calV2 });
+const adminSettings = (s) => ({ whatsapp: s.whatsapp || '+971509693948', defaultTz: TZS[s.defaultTz] ? s.defaultTz : 'Asia/Dubai', waMsg: s.waMsg || '', waMsgOnline: s.waMsgOnline || '', calUrl: s.calUrl || '', calEmail: s.calEmail || '', calSecret: s.calSecret || '', calNeedsUpdate: !!s.calUrl && !s.calV2 });
 const calOk = (r) => r && (r.status === 'confirmed' || r.status === 'approved');
 async function calPost(cfg, payload, wait = 9000) {
   if (!cfg || !cfg.calUrl) return { ok: false, error: 'Calendar invitations are not connected.' };
@@ -331,6 +331,7 @@ export function createEvents({ getStore, json }) {
         const cur = await rawSettings(); cur.whatsapp = cur.whatsapp || '+971509693948';
         if (body.calUrl !== undefined) { const u = String(body.calUrl).trim(); if (u && !/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u)) return json(400, { error: 'Paste the Web app URL from Apps Script. It starts with https://script.google.com/macros/s/ and ends with /exec' }); cur.calUrl = u; if (!u) cur.calEmail = ''; }
         if (body.whatsapp !== undefined) { const w = String(body.whatsapp).replace(/[^\d+]/g, ''); if (!/^\+\d{8,15}$/.test(w)) return json(400, { error: 'WhatsApp number: include the country code, like +971509693948.' }); cur.whatsapp = w; }
+        if (body.defaultTz !== undefined) { if (!TZS[body.defaultTz]) return json(400, { error: 'Please choose a time zone from the list.' }); cur.defaultTz = body.defaultTz; }
         if (body.waMsg !== undefined) cur.waMsg = waText(body.waMsg);              // common WhatsApp message, in-person events
         if (body.waMsgOnline !== undefined) cur.waMsgOnline = waText(body.waMsgOnline); // and online events
         if (!cur.calSecret) cur.calSecret = crypto.randomBytes(18).toString('base64url');
@@ -350,7 +351,7 @@ export function createEvents({ getStore, json }) {
       return json(200, { events: out, settings: adminSettings(await rawSettings()) });
     }
     if (path === '/admin/events' && method === 'POST') {
-      const e = clean({ tz: 'Asia/Dubai', mode: 'offline', regMode: 'form', regOpen: true, published: true, currency: 'AED', maxSeats: 1, ...body });
+      const e = clean({ tz: (await rawSettings()).defaultTz || 'Asia/Dubai', mode: 'offline', regMode: 'form', regOpen: true, published: true, currency: 'AED', maxSeats: 1, ...body });
       const err = validate(e); if (err) return json(400, { error: err });
       e.id = crypto.randomBytes(8).toString('hex');
       const used = new Set((await all()).map((x) => x.slug)); let slug = slugify(e.title); let n = 2; while (used.has(slug)) slug = `${slugify(e.title)}-${n++}`;
