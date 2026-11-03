@@ -1,0 +1,35 @@
+<section class="section" id="contact" style="padding-bottom:60px">
+  <div class="wrap">
+    <div class="contact-card reveal">
+      <img class="contact-q float" src="/assets/img/aqlyon-q.png" alt="" width="762" height="800">
+      <div class="contact-left">
+        <h2>{{ home.contact.heading_line1 }}<br><span>{{ home.contact.heading_line2 }}</span></h2>
+        <div class="contact-lines">
+          {% for o in site.offices %}
+          <div><p>{{ o.label }}</p><a href="https://wa.me/{{ o.phone | waDigits }}">{{ o.phone }}</a></div>
+          {% endfor %}
+          <div><p>Email</p><a href="mailto:{{ site.email }}">{{ site.email }}</a></div>
+        </div>
+      </div>
+      <form class="callback" name="callback" method="POST" action="/thanks/" data-netlify="true" netlify-honeypot="company">
+        <input type="hidden" name="form-name" value="callback">
+        <p class="hp"><label>Leave this empty <input name="company" tabindex="-1" autocomplete="off"></label></p>
+        <h3>Request a call back</h3>
+        <p>{{ home.contact.form_intro }}</p>
+        <label>Your name<input name="name" required autocomplete="name"></label>
+        <label>Phone or WhatsApp<input name="phone" type="tel" required autocomplete="tel"></label>
+        <label>What do you need?
+          <select name="interest">
+            <option>Branding &amp; logo</option>
+            <option>Explainer video</option>
+            <option>Event media coverage</option>
+            <option>Content &amp; social media</option>
+            <option>Ads &amp; lead generation</option>
+            <option>Something else</option>
+          </select>
+        </label>
+        <button class="btn btn-green" type="submit">Request a call back</button>
+      </form>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,31 @@
+---
+layout: layouts/base.njk
+---
+<section class="wrap page-head">
+  <p class="crumbs"><a href="/">Home</a> / <a href="/events/">Events</a></p>
+  <p class="kicker" style="margin-bottom:22px">{% if location %}{{ location }} · {% endif %}{{ page.date | readableDate }}{% if client %} · For {{ client }}{% endif %}</p>
+  <h1 style="font-size:clamp(40px,7vw,100px)">{{ title }}</h1>
+  {% if summary %}<p>{{ summary }}</p>{% endif %}
+</section>
+<section class="wrap">
+  {% if content | trim %}<div class="prose" style="margin:0 0 40px">{{ content | safe }}</div>{% endif %}
+  {% if photos and photos.length %}
+  <div class="gallery" data-gallery>
+    {% for ph in photos %}
+    <button type="button" data-full="{{ ph.image }}" data-caption="{{ ph.caption or '' }}" aria-label="Open photo {{ loop.index }}{% if ph.caption %}: {{ ph.caption }}{% endif %}"><img src="{{ ph.image }}" alt="{{ ph.caption or (title + ' photo ' + loop.index) }}" loading="lazy"></button>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="empty">Photos coming soon.</p>
+  {% endif %}
+  {% if video %}<p style="margin-top:28px"><a class="btn btn-dark" href="{{ video }}" rel="noopener">Watch the recap film →</a></p>{% endif %}
+</section>
+<dialog class="lightbox" data-lightbox aria-label="Photo viewer">
+  <img src="" alt="">
+  <div class="lb-bar">
+    <button type="button" data-lb="prev" aria-label="Previous photo">←</button>
+    <span class="lb-cap"></span>
+    <span style="display:flex;gap:8px"><button type="button" data-lb="next" aria-label="Next photo">→</button><button type="button" data-lb="close">Close</button></span>
+  </div>
+</dialog>
+{% include "partials/contact.njk" %}

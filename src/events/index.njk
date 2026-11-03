@@ -1,0 +1,21 @@
+---
+layout: layouts/base.njk
+title: Events
+description: Event coverage, live content and recap films by Aqlyon.
+permalink: /events/
+---
+<section class="wrap page-head">
+  <p class="crumbs"><a href="/">Home</a> / Events</p>
+  <h1>Events we've<br><span style="color:var(--green-hi)">powered.</span></h1>
+  <p>{{ home.events_intro }}</p>
+</section>
+<section class="wrap" style="padding-bottom:40px">
+  {% if collections.events.length %}
+  <div class="events-grid">
+    {% for ev in collections.events %}{% include "partials/event-card.njk" %}{% endfor %}
+  </div>
+  {% else %}
+  <p class="empty">Event galleries will appear here soon.</p>
+  {% endif %}
+</section>
+{% include "partials/contact.njk" %}

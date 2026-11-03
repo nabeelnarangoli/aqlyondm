@@ -1,0 +1,6 @@
+<a class="event-card reveal" href="{{ ev.url }}">
+  {% set evCover = ev.data.cover or (ev.data.photos[0].image if ev.data.photos and ev.data.photos.length) %}
+  {% if evCover %}<img src="{{ evCover }}" alt="" loading="lazy">{% endif %}
+  {% if ev.data.photos and ev.data.photos.length %}<span class="count">{{ ev.data.photos.length }} photo{{ "s" if ev.data.photos.length != 1 }}</span>{% endif %}
+  <span class="cap"><b>{{ ev.data.title }}</b><small>{% if ev.data.location %}{{ ev.data.location }} · {% endif %}{{ ev.date | readableDate }}</small></span>
+</a>

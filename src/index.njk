@@ -1,0 +1,161 @@
+---
+layout: layouts/base.njk
+permalink: /
+---
+{% set h = home.hero %}
+<!-- ============ HERO ============ -->
+<section class="hero" data-hero>
+  <span class="hero-glow" aria-hidden="true"></span>
+  <span class="hero-ring" aria-hidden="true"></span>
+  <div class="hero-decor" aria-hidden="true">
+    <div class="par" style="right:7%;top:40px;transform:translate(calc(var(--mx,0)*18px),calc(var(--my,0)*18px))">
+      <div class="q-eye">
+        <svg viewBox="0 0 400 400" style="position:absolute;inset:0;width:400px;height:400px"><g class="spin-slow"><circle cx="200" cy="200" r="194" fill="none" stroke="#0B0B0B" stroke-opacity=".2" stroke-dasharray="3 12"/></g></svg>
+        <span class="white"></span><span class="pupil"></span>
+        <img class="q" src="/assets/img/aqlyon-q.png" alt="" width="762" height="800">
+      </div>
+    </div>
+    <div class="par" style="right:36%;top:10px;transform:translate(calc(var(--mx,0)*-50px),calc(var(--my,0)*-40px))"><div class="float" style="width:92px;height:92px;border-radius:24px;background:#FFB547;transform:rotate(-10deg);display:flex;align-items:center;justify-content:center"><svg width="40" height="40" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z" fill="#0B0B0B"/></svg></div></div>
+    <div class="par" style="right:4%;top:470px;transform:translate(calc(var(--mx,0)*-70px),calc(var(--my,0)*-50px))"><div class="float" style="width:120px;height:84px;border-radius:22px;background:#C9B8FF;display:flex;align-items:flex-end;justify-content:center;gap:6px;padding-bottom:16px;animation-delay:.8s"><span class="bar" style="width:12px;height:44px;border-radius:3px;background:#0B0B0B"></span><span class="bar" style="width:12px;height:44px;border-radius:3px;background:#0B0B0B;animation-delay:.2s"></span><span class="bar" style="width:12px;height:44px;border-radius:3px;background:#0B0B0B;animation-delay:.4s"></span></div></div>
+    <div class="par" style="right:33%;top:500px;transform:translate(calc(var(--mx,0)*60px),calc(var(--my,0)*40px))"><div class="float" style="width:74px;height:74px;border-radius:50%;background:#FF6B57;display:flex;align-items:center;justify-content:center;animation-delay:1.4s"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.6 4.5c2.1 0 3.6 1.2 5.4 3.1 1.8-1.9 3.3-3.1 5.4-3.1 3.6 0 5.7 3.9 4.2 7.3C19.5 16.4 12 21 12 21z" fill="#fff"/></svg></div></div>
+    <div class="par" style="right:26%;top:270px;transform:translate(calc(var(--mx,0)*-90px),calc(var(--my,0)*-70px))"><span style="display:block;width:26px;height:26px;border-radius:8px;background:#8FD3FF;transform:rotate(20deg)"></span></div>
+    <div class="par" style="left:46%;top:610px;transform:translate(calc(var(--mx,0)*80px),calc(var(--my,0)*60px))"><span style="display:block;width:18px;height:18px;border-radius:50%;background:#0B0B0B"></span></div>
+  </div>
+  <div class="wrap hero-copy">
+    <p class="kicker fade-up"><span class="dot-live blink"></span>{{ h.kicker }}</p>
+    <h1>
+      <span class="rise-wrap"><span class="rise">{{ h.line1 }}</span></span><br>
+      <span class="rise-wrap"><span class="rise" style="animation-delay:.12s">{{ h.line2_prefix }} <span class="hl" aria-label="{{ h.line2_highlight }}">{% for ch in h.line2_highlight | letters %}<span class="wave" aria-hidden="true" style="animation-delay:{{ loop.index0 * 0.06 }}s">{{ ch }}</span>{% endfor %}</span></span></span><br>
+      <span class="rise-wrap"><span class="rise" style="animation-delay:.24s">{{ h.line3 }}</span></span>
+    </h1>
+    <p class="hero-intro fade-up" style="animation-delay:.4s">{{ h.intro }}</p>
+    <div class="hero-ctas fade-up" style="animation-delay:.55s">
+      <a class="btn btn-dark" href="#journey">{{ h.primary_cta }}</a>
+      <a class="btn btn-green" href="https://wa.me/{{ site.whatsapp | waDigits }}">{{ h.secondary_cta }}</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CLIENTS ============ -->
+{% if collections.clients.length %}
+<section class="clients" aria-labelledby="clients-h">
+  <h2 id="clients-h">{{ home.clients_heading }}</h2>
+  <div class="marquee">
+    {% for pass in [1, 2] %}
+    {% for c in collections.clients %}
+    <span class="client"{% if pass == 2 %} aria-hidden="true"{% endif %}>
+      {% if c.data.logo %}<img src="{{ c.data.logo }}" alt="{{ c.data.title }}" loading="lazy">{% else %}<span>{{ c.data.title }}</span>{% endif %}
+      <span class="sep" aria-hidden="true">✦</span>
+    </span>
+    {% endfor %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ============ JOURNEY ============ -->
+{% set chapters = home.journey.chapters %}
+<section class="journey" id="journey" aria-label="{{ home.journey.heading }}" data-journey>
+  <div class="journey-stage">
+    <div class="wrap journey-top"><span>{{ home.journey.heading }}</span><span><span data-step-num>01</span> <span class="of">/ {{ chapters.length | pad2 }}</span></span></div>
+    <div class="wrap journey-main">
+      <div class="chapter-texts" aria-live="polite">
+        {% for ch in chapters %}
+        <div class="chapter-text{% if loop.first %} is-active{% endif %}" data-chapter="{{ loop.index0 }}">
+          <p class="tag-pill">{{ loop.index | pad2 }} · {{ ch.kicker }}</p>
+          <h2>{{ ch.title }}</h2>
+          <p class="body">{{ ch.body }}</p>
+          <p class="deliver"><span>We deliver:</span> {{ ch.tag }}</p>
+        </div>
+        {% endfor %}
+      </div>
+      {% include "partials/scenes.njk" %}
+    </div>
+    <div class="wrap road">
+      <div class="road-track"><div class="road-fill"></div><div class="road-dot"></div></div>
+      <div class="nodes">
+        {% for ch in chapters %}<button class="node{% if loop.first %} is-active{% endif %}" type="button" data-go="{{ loop.index0 }}" aria-label="Go to step {{ loop.index }}: {{ ch.kicker }}">{{ ch.kicker }}</button>{% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section class="section" id="services">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>{{ home.services.heading }}</h2>
+      <p>{{ home.services.intro }}</p>
+    </div>
+    {% set tileBg = ["#22AD72", "#0B0B0B", "#FF6B57", "#FFB547", "#C9B8FF", "#8FD3FF", "#FFFFFF"] %}
+    <div class="bento">
+      {% for s in home.services.items %}
+      {% set i = loop.index0 %}
+      <a class="tile{% if i == 0 %} big{% endif %}" href="https://wa.me/{{ site.whatsapp | waDigits }}?text={{ ('Hi Aqlyon, I would like to know more about ' + s.title) | urlencode }}" style="background:{{ tileBg[i % 7] }};{% if i == 1 %}color:#fff;{% endif %}">
+        {% include "partials/service-decor.njk" %}
+        <span class="num"{% if i == 1 %} style="color:#B5B5B5"{% endif %}>{{ loop.index | pad2 }}</span>
+        <span>
+          <h3>{{ s.title }}</h3>
+          {% if s.summary and (i == 0 or i >= 5) %}<span class="sum">{{ s.summary }}</span>{% endif %}
+        </span>
+        {% if i == 0 %}<span class="go" aria-hidden="true">→</span>{% endif %}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIALS ============ -->
+{% if collections.testimonials.length %}
+<section class="section" id="testimonials">
+  <div class="wrap">
+    <div class="section-head reveal"><h2>{{ home.testimonials_heading }}</h2></div>
+    <div class="quotes">
+      {% for t in collections.testimonials | limit(6) %}
+      <figure class="quote reveal" style="margin:0">
+        <span class="mark" aria-hidden="true">“</span>
+        <blockquote>{{ t.data.quote }}</blockquote>
+        {% if t.data.rating %}<span class="stars" aria-label="{{ t.data.rating }} out of 5 stars">{% for s in range(0, t.data.rating) %}<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3 6.5 7 .9-5.1 4.8 1.3 7L12 17.8 5.8 21.2l1.3-7L2 9.4l7-.9z" fill="#0B0B0B"/></svg>{% endfor %}</span>{% endif %}
+        <figcaption class="who">
+          {% if t.data.photo %}<img src="{{ t.data.photo }}" alt="" loading="lazy">{% else %}<span class="initial" aria-hidden="true">{{ t.data.title | initial }}</span>{% endif %}
+          <span><b>{{ t.data.title }}</b><small>{{ t.data.role }}{% if t.data.role and t.data.company %}, {% endif %}{{ t.data.company }}</small></span>
+        </figcaption>
+      </figure>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ============ EVENTS ============ -->
+{% if collections.events.length %}
+<section class="section" id="events">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>{{ home.events_heading }}</h2>
+      <a class="link-arrow" href="/events/">All events →</a>
+    </div>
+    <div class="events-grid">
+      {% for ev in collections.events | limit(5) %}{% include "partials/event-card.njk" %}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ============ BLOG ============ -->
+{% if collections.posts.length %}
+<section class="section" id="insights">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>{{ home.blog_heading }}</h2>
+      <a class="link-arrow" href="/blog/">All posts →</a>
+    </div>
+    <div class="posts">
+      {% for post in collections.posts | limit(3) %}{% include "partials/post-card.njk" %}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ============ CONTACT ============ -->
+{% include "partials/contact.njk" %}

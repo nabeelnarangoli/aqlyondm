@@ -1,0 +1,10 @@
+<a class="post-card reveal" href="{{ post.url }}">
+  <div class="cover">
+    {% if post.data.cover %}<img src="{{ post.data.cover }}" alt="" loading="lazy">{% else %}<img class="q" src="/assets/img/aqlyon-q.png" alt="" loading="lazy">{% endif %}
+  </div>
+  <div class="body">
+    <span class="meta">{{ post.data.category or "Insights" }} · {{ post.date | readableDate }}</span>
+    <h3>{{ post.data.title }}</h3>
+    {% if post.data.excerpt %}<p>{{ post.data.excerpt }}</p>{% endif %}
+  </div>
+</a>

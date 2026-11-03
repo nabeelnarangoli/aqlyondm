@@ -1,0 +1,30 @@
+---
+layout: layouts/base.njk
+---
+<article>
+  <header class="wrap page-head" style="max-width:960px">
+    <p class="crumbs"><a href="/">Home</a> / <a href="/blog/">Blog</a></p>
+    <p class="kicker" style="margin-bottom:22px">{{ category or "Insights" }} · {{ page.date | readableDate }} · {{ content | readingTime }} min read</p>
+    <h1 style="font-size:clamp(40px,6vw,80px)">{{ title }}</h1>
+    {% if excerpt %}<p>{{ excerpt }}</p>{% endif %}
+  </header>
+  {% if cover %}<div class="wrap" style="max-width:1100px"><figure class="post-hero" style="margin:0 0 48px"><img src="{{ cover }}" alt="{{ cover_alt or '' }}"></figure></div>{% endif %}
+  <div class="wrap">
+    <div class="prose">{{ content | safe }}</div>
+    <aside class="post-cta">
+      <b>Want this for your brand?</b>
+      <a class="btn btn-dark" href="https://wa.me/{{ site.whatsapp | waDigits }}?text={{ ('Hi Aqlyon, I read "' + title + '" and would like to talk.') | urlencode }}">Talk to us →</a>
+    </aside>
+  </div>
+</article>
+{% set more = [] %}
+{% for p in collections.posts %}{% if p.url != page.url and more.length < 3 %}{% set _ = more.push(p) %}{% endif %}{% endfor %}
+{% if more.length %}
+<section class="section">
+  <div class="wrap">
+    <div class="section-head"><h2 style="font-size:clamp(34px,4vw,56px)">Keep reading</h2><a class="link-arrow" href="/blog/">All posts →</a></div>
+    <div class="posts">{% for post in more %}{% include "partials/post-card.njk" %}{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+<div style="height:60px"></div>

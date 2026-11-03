@@ -1,0 +1,12 @@
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="{{ site.title }}, home"><img src="/assets/img/aqlyon-logo.png" alt="{{ site.title }}" width="900" height="320"></a>
+    <nav class="nav" aria-label="Main">
+      <a href="/#journey">Journey</a>
+      <a href="/#services">Services</a>
+      <a href="/events/"{% if page.url.startsWith('/events/') %} aria-current="page"{% endif %}>Events</a>
+      <a href="/blog/"{% if page.url.startsWith('/blog/') %} aria-current="page"{% endif %}>Blog</a>
+      <a class="btn btn-dark" href="/#contact">Let's talk</a>
+    </nav>
+  </div>
+</header>

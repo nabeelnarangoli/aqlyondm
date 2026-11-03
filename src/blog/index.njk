@@ -1,0 +1,21 @@
+---
+layout: layouts/base.njk
+title: Blog
+description: Marketing, branding and content ideas from the Aqlyon team.
+permalink: /blog/
+---
+<section class="wrap page-head">
+  <p class="crumbs"><a href="/">Home</a> / Blog</p>
+  <h1>Ideas that<br><span style="color:var(--green-hi)">move brands.</span></h1>
+  <p>Practical marketing, branding and content advice from the Aqlyon team.</p>
+</section>
+<section class="wrap" style="padding-bottom:40px">
+  {% if collections.posts.length %}
+  <div class="posts">
+    {% for post in collections.posts %}{% include "partials/post-card.njk" %}{% endfor %}
+  </div>
+  {% else %}
+  <p class="empty">No posts yet. New articles will appear here.</p>
+  {% endif %}
+</section>
+{% include "partials/contact.njk" %}

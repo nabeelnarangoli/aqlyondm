@@ -1,0 +1,206 @@
+# Aqlyon content manager (Decap CMS). Open https://<your-site>/admin/ and log in with GitHub.
+# Every save is a commit to the branch below, and Netlify rebuilds the live site in about a minute.
+backend:
+  name: github
+  repo: nabeelnarangoli/aqlyondm
+  branch: main
+  commit_messages:
+    create: "Add {{collection}} “{{slug}}”"
+    update: "Update {{collection}} “{{slug}}”"
+    delete: "Delete {{collection}} “{{slug}}”"
+    uploadMedia: "Upload “{{path}}”"
+    deleteMedia: "Delete “{{path}}”"
+
+# For editing on your own computer: run `npx decap-server` and `npm start`, then open http://localhost:8080/admin/
+local_backend: true
+
+site_url: https://aqlyondm.com
+logo_url: /assets/img/aqlyon-logo.png
+media_folder: src/uploads
+public_folder: /uploads
+
+collections:
+  # ---------------- BLOG ----------------
+  - name: blog
+    label: Blog posts
+    label_singular: Blog post
+    description: Articles shown on /blog and the home page. Turn on “Draft” to hide a post from the site.
+    folder: src/blog/posts
+    create: true
+    slug: "{{slug}}"
+    preview_path: "blog/{{slug}}/"
+    summary: "{{title}} — {{date | date('DD MMM YYYY')}}{{draft | ternary(' (draft)', '')}}"
+    sortable_fields: [date, title]
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Publish date, name: date, widget: datetime, format: "YYYY-MM-DD", date_format: "DD MMM YYYY", time_format: false }
+      - { label: Draft (hide from site), name: draft, widget: boolean, default: false, required: false }
+      - label: Category
+        name: category
+        widget: select
+        default: Marketing
+        options: [Marketing, Branding, Social Media, Content, Video, Events, Lead Generation, News]
+      - { label: Short summary, name: excerpt, widget: text, hint: "One or two sentences. Shown on blog cards and in Google results.", required: false }
+      - { label: Cover image, name: cover, widget: image, required: false, hint: "Wide image, at least 1600 px across." }
+      - { label: Cover image description, name: cover_alt, widget: string, required: false, hint: "Describe the image for people using screen readers." }
+      - { label: Article, name: body, widget: markdown }
+
+  # ---------------- TESTIMONIALS ----------------
+  - name: testimonials
+    label: Customer testimonials
+    label_singular: Testimonial
+    description: Real quotes from clients, shown on the home page (up to 6). The section stays hidden until you add one.
+    folder: src/testimonials
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}} — {{company}}"
+    sortable_fields: [order, title]
+    fields:
+      - { label: Client name, name: title, widget: string }
+      - { label: Role, name: role, widget: string, required: false, hint: "e.g. Founder" }
+      - { label: Company, name: company, widget: string, required: false }
+      - { label: What they said, name: quote, widget: text }
+      - { label: Star rating, name: rating, widget: number, value_type: int, min: 1, max: 5, required: false }
+      - { label: Photo, name: photo, widget: image, required: false, hint: "Square photo works best. Leave empty to show their initial." }
+      - { label: Display order, name: order, widget: number, value_type: int, default: 10, hint: "Lower numbers show first." }
+      - { label: Hide from site, name: draft, widget: boolean, default: false, required: false }
+
+  # ---------------- CLIENT LOGOS ----------------
+  - name: clients
+    label: Client logos
+    label_singular: Client
+    description: Logos in the scrolling strip under the home page hero. If a client has no logo, their name is shown instead.
+    folder: src/clients
+    create: true
+    slug: "{{slug}}"
+    sortable_fields: [order, title]
+    fields:
+      - { label: Client name, name: title, widget: string }
+      - { label: Logo, name: logo, widget: image, required: false, hint: "PNG with transparent background, or a logo on white." }
+      - { label: Website, name: website, widget: string, required: false }
+      - { label: Display order, name: order, widget: number, value_type: int, default: 10 }
+      - { label: Hide from site, name: draft, widget: boolean, default: false, required: false }
+
+  # ---------------- EVENTS ----------------
+  - name: events
+    label: Event photos
+    label_singular: Event
+    description: Each event gets its own photo gallery page under /events. The newest five also appear on the home page.
+    folder: src/events
+    create: true
+    slug: "{{slug}}"
+    preview_path: "events/{{slug}}/"
+    summary: "{{title}} — {{date | date('DD MMM YYYY')}}"
+    sortable_fields: [date, title]
+    fields:
+      - { label: Event name, name: title, widget: string }
+      - { label: Event date, name: date, widget: datetime, format: "YYYY-MM-DD", date_format: "DD MMM YYYY", time_format: false }
+      - { label: Location, name: location, widget: string, required: false, hint: "e.g. Dubai, UAE" }
+      - { label: Client / organiser, name: client, widget: string, required: false }
+      - { label: Short summary, name: summary, widget: text, required: false }
+      - { label: Cover photo, name: cover, widget: image, required: false, hint: "Leave empty to use the first gallery photo." }
+      - label: Gallery photos
+        name: photos
+        widget: list
+        allow_add: true
+        collapsed: true
+        summary: "{{fields.caption}}"
+        fields:
+          - { label: Photo, name: image, widget: image }
+          - { label: Caption, name: caption, widget: string, required: false }
+      - { label: Recap video link, name: video, widget: string, required: false, hint: "YouTube or Instagram link" }
+      - { label: Write-up, name: body, widget: markdown, required: false }
+      - { label: Hide from site, name: draft, widget: boolean, default: false, required: false }
+
+  # ---------------- SITE CONTENT ----------------
+  - name: settings
+    label: Site content
+    editor: { preview: false }
+    files:
+      - name: home
+        label: Home page text
+        file: src/_data/home.json
+        fields:
+          - label: Hero (top of page)
+            name: hero
+            widget: object
+            fields:
+              - { label: Small label, name: kicker, widget: string }
+              - { label: Headline line 1, name: line1, widget: string }
+              - { label: Headline line 2 (before the animated word), name: line2_prefix, widget: string }
+              - { label: Animated green word, name: line2_highlight, widget: string }
+              - { label: Headline line 3, name: line3, widget: string }
+              - { label: Intro text, name: intro, widget: text }
+              - { label: Dark button, name: primary_cta, widget: string }
+              - { label: Green button (opens WhatsApp), name: secondary_cta, widget: string }
+          - label: Journey (scroll story)
+            name: journey
+            widget: object
+            fields:
+              - { label: Heading, name: heading, widget: string }
+              - label: Steps
+                name: chapters
+                widget: list
+                min: 7
+                max: 7
+                allow_add: false
+                hint: "Seven steps, each with its own animation, in this order: start, logo, assets, content, social, leads, sales."
+                summary: "{{fields.kicker}} — {{fields.title}}"
+                fields:
+                  - { label: Short label, name: kicker, widget: string }
+                  - { label: Title, name: title, widget: string }
+                  - { label: Text, name: body, widget: text }
+                  - { label: We deliver, name: tag, widget: string }
+          - label: Services
+            name: services
+            widget: object
+            fields:
+              - { label: Heading, name: heading, widget: string }
+              - { label: Intro, name: intro, widget: text }
+              - label: Service tiles
+                name: items
+                widget: list
+                min: 7
+                max: 7
+                allow_add: false
+                summary: "{{fields.title}}"
+                fields:
+                  - { label: Title, name: title, widget: string }
+                  - { label: Short description, name: summary, widget: string, required: false }
+          - { label: Client logos heading, name: clients_heading, widget: string }
+          - { label: Testimonials heading, name: testimonials_heading, widget: string }
+          - { label: Events heading, name: events_heading, widget: string }
+          - { label: Events intro, name: events_intro, widget: text }
+          - { label: Blog heading, name: blog_heading, widget: string }
+          - label: Contact section
+            name: contact
+            widget: object
+            fields:
+              - { label: Heading line 1, name: heading_line1, widget: string }
+              - { label: Heading line 2 (green), name: heading_line2, widget: string }
+              - { label: Call-back form intro, name: form_intro, widget: string }
+      - name: site
+        label: Contact details & social links
+        file: src/_data/site.json
+        fields:
+          - { label: Site name, name: title, widget: string }
+          - { label: Google description, name: description, widget: text }
+          - { label: Website address, name: url, widget: string }
+          - { label: Email, name: email, widget: string }
+          - { label: WhatsApp number for buttons, name: whatsapp, widget: string, hint: "Include country code, e.g. +971509693948" }
+          - label: Offices
+            name: offices
+            widget: list
+            summary: "{{fields.label}} — {{fields.phone}}"
+            fields:
+              - { label: Place, name: label, widget: string }
+              - { label: Company name, name: company, widget: string }
+              - { label: Phone / WhatsApp, name: phone, widget: string }
+          - label: Social links
+            name: social
+            widget: object
+            fields:
+              - { label: Instagram, name: instagram, widget: string }
+              - { label: Facebook, name: facebook, widget: string }
+              - { label: LinkedIn, name: linkedin, widget: string }
+              - { label: YouTube, name: youtube, widget: string }

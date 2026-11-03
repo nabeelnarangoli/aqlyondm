@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% set pageTitle = (title + " · " + site.title) if title else site.title %}
+{% set pageDesc = description or excerpt or site.description %}
+<title>{{ pageTitle }}</title>
+<meta name="description" content="{{ pageDesc }}">
+<link rel="canonical" href="{{ page.url | absoluteUrl(site.url) }}">
+<meta property="og:type" content="{{ 'article' if layout == 'layouts/post.njk' else 'website' }}">
+<meta property="og:title" content="{{ pageTitle }}">
+<meta property="og:description" content="{{ pageDesc }}">
+<meta property="og:url" content="{{ page.url | absoluteUrl(site.url) }}">
+<meta property="og:image" content="{{ (cover or '/assets/img/aqlyon-logo.png') | absoluteUrl(site.url) }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0B0B0B">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":{{ site.title | dump | safe }},"url":{{ site.url | dump | safe }},"logo":{{ ('/assets/img/aqlyon-logo.png' | absoluteUrl(site.url)) | dump | safe }},"email":{{ site.email | dump | safe }},"sameAs":[{{ site.social.instagram | dump | safe }},{{ site.social.facebook | dump | safe }},{{ site.social.linkedin | dump | safe }},{{ site.social.youtube | dump | safe }}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+{% include "partials/header.njk" %}
+<main id="main">
+{{ content | safe }}
+</main>
+{% include "partials/footer.njk" %}
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

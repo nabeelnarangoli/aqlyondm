@@ -1,0 +1,47 @@
+{
+  "hero": {
+    "kicker": "Digital marketing & creative studio · Dubai · Kerala",
+    "line1": "From day one",
+    "line2_prefix": "to",
+    "line2_highlight": "daily",
+    "line3": "sales.",
+    "intro": "Starting a company? We build your brand, create every asset, run your marketing and bring in the leads — one partner for the whole journey.",
+    "primary_cta": "Take the journey ↓",
+    "secondary_cta": "Start a project →"
+  },
+  "journey": {
+    "heading": "Your journey with Aqlyon",
+    "chapters": [
+      { "kicker": "Day one", "title": "You start a company.", "body": "Every big brand begins as an idea. We help you shape it — a name, a position and a brand strategy built to grow.", "tag": "Brand strategy & naming" },
+      { "kicker": "Identity", "title": "Your logo is born.", "body": "A mark people remember, with colours, type and a voice that feel unmistakably yours.", "tag": "Logo & visual identity" },
+      { "kicker": "Assets", "title": "Every touchpoint, ready.", "body": "Website visuals, business cards, social kits and print — one consistent brand everywhere you show up.", "tag": "Graphic design & digital assets" },
+      { "kicker": "Content", "title": "Stories that stop the scroll.", "body": "Explainer videos, reels, photography and brand films that make people feel something.", "tag": "Explainer videos · Photo & video" },
+      { "kicker": "Community", "title": "An audience that grows.", "body": "Planned posts, real conversations and monthly analytics — your social channels, fully managed.", "tag": "Social media management" },
+      { "kicker": "Growth", "title": "Leads start flowing.", "body": "Targeted campaigns turn attention into enquiries — the right people, asking about you.", "tag": "Digital marketing & lead generation" },
+      { "kicker": "Every day", "title": "Sales, day after day.", "body": "Launches, events and always-on marketing keep customers coming back. And we stay right beside you.", "tag": "Event media & brand management" }
+    ]
+  },
+  "services": {
+    "heading": "Everything, one studio.",
+    "intro": "Seven crafts working together, so every step of your journey feels like one brand.",
+    "items": [
+      { "title": "Branding", "summary": "Strategy, logo, identity, voice." },
+      { "title": "Explainer Videos", "summary": "2D and 3D animated explainers." },
+      { "title": "Event Media", "summary": "Live coverage and recap films." },
+      { "title": "Content Creation", "summary": "Reels, posts, photography, blogs." },
+      { "title": "Graphic Design", "summary": "Social graphics and print." },
+      { "title": "Photo & Video", "summary": "Product shoots and brand films." },
+      { "title": "Social & Leads", "summary": "Management, ads and lead generation." }
+    ]
+  },
+  "clients_heading": "Brands we've worked with",
+  "testimonials_heading": "What our clients say",
+  "events_heading": "Events we've powered",
+  "events_intro": "Live coverage, real-time content and recap films from recent events.",
+  "blog_heading": "Latest insights",
+  "contact": {
+    "heading_line1": "Ready to start",
+    "heading_line2": "your journey?",
+    "form_intro": "Leave your number and we'll call you back."
+  }
+}
