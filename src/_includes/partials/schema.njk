@@ -1,0 +1,51 @@
+{# Structured data for Google rich results: the business on every page, plus Article and Breadcrumbs on posts. #}
+{% set org = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "@id": site.url + "/#organization",
+  "name": site.title,
+  "url": site.url,
+  "logo": "/assets/img/aqlyon-logo.png" | absoluteUrl(site.url),
+  "image": "/img/og-default.png" | absoluteUrl(site.url),
+  "email": site.email,
+  "description": site.description,
+  "areaServed": ["United Arab Emirates", "Kerala, India"],
+  "sameAs": [site.social.instagram, site.social.facebook, site.social.linkedin, site.social.youtube]
+} %}
+<script type="application/ld+json">{{ org | dump | safe }}</script>
+{% for o in site.offices %}
+<script type="application/ld+json">{{ {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": o.company,
+  "parentOrganization": { "@id": site.url + "/#organization" },
+  "url": site.url,
+  "image": "/img/og-default.png" | absoluteUrl(site.url),
+  "telephone": o.phone,
+  "address": { "@type": "PostalAddress", "streetAddress": o.address, "addressRegion": o.label }
+} | dump | safe }}</script>
+{% endfor %}
+{% if layout == "layouts/post.njk" %}
+<script type="application/ld+json">{{ {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": title,
+  "description": pageDesc,
+  "image": [pageImage],
+  "datePublished": page.date | isoDate,
+  "dateModified": (updated or page.date) | isoDate,
+  "author": { "@type": "Organization", "name": site.title, "url": site.url },
+  "publisher": { "@id": site.url + "/#organization" },
+  "mainEntityOfPage": pageUrl,
+  "keywords": focus_keyword or category
+} | dump | safe }}</script>
+<script type="application/ld+json">{{ {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": site.url + "/" },
+    { "@type": "ListItem", "position": 2, "name": "Blog", "item": site.url + "/blog/" },
+    { "@type": "ListItem", "position": 3, "name": title, "item": pageUrl }
+  ]
+} | dump | safe }}</script>
+{% endif %}

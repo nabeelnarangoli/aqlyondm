@@ -44,6 +44,11 @@ collections:
       - { label: Cover image, name: cover, widget: image, required: false, hint: "Wide image, at least 1600 px across." }
       - { label: Cover image description, name: cover_alt, widget: string, required: false, hint: "Describe the image for people using screen readers." }
       - { label: Article, name: body, widget: markdown }
+      - { label: "SEO · Focus keyword", name: focus_keyword, widget: string, required: false, hint: "The search phrase this post should rank for, e.g. 'branding agency in Kerala'. The SEO check on the right scores the post for it." }
+      - { label: "SEO · Title for Google", name: seo_title, widget: string, required: false, hint: "Optional. 50–60 characters. Leave empty to use the post title + site name." }
+      - { label: "SEO · Meta description", name: meta_description, widget: text, required: false, hint: "Optional. 120–160 characters shown under the title in Google. Leave empty to use the short summary." }
+      - { label: "SEO · Last updated", name: updated, widget: datetime, format: "YYYY-MM-DD", date_format: "DD MMM YYYY", time_format: false, required: false, hint: "Set this when you refresh an old post; Google sees the new date." }
+      - { label: "SEO · Hide from Google", name: noindex, widget: boolean, default: false, required: false }
 
   # ---------------- TESTIMONIALS ----------------
   - name: testimonials
@@ -187,6 +192,9 @@ collections:
         file: src/_data/site.json
         fields:
           - { label: Site name, name: title, widget: string }
+          - { label: "Home page title for Google", name: seo_home_title, widget: string, hint: "Shown after the site name on the home page tab and in Google, e.g. 'Branding & Digital Marketing Agency in Dubai and Kerala'." }
+          - { label: "Home page focus keyword", name: seo_home_keyword, widget: string, required: false, hint: "The main search phrase the home page should rank for. The SEO report at /seo scores the home page for it." }
+          - { label: "Google Search Console verification code", name: google_verification, widget: string, required: false, hint: "Only the content=\"…\" value from Search Console's HTML tag method." }
           - { label: Google description, name: description, widget: text }
           - { label: Website address, name: url, widget: string }
           - { label: Email, name: email, widget: string }

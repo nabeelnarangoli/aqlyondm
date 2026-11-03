@@ -1,0 +1,8 @@
+---
+permalink: /seo/site.json
+eleventyExcludeFromCollections: true
+---
+{%- set svc = [] %}{% for s in home.services.items %}{% set _ = svc.push(s.title) %}{% endfor -%}
+{%- set offices = [] %}{% for o in site.offices %}{% set _ = offices.push(o.company + " (" + o.address + ")") %}{% endfor -%}
+{%- set posts = [] %}{% for p in collections.posts %}{% set _ = posts.push(p.data.title) %}{% endfor -%}
+{{ { "title": site.title, "url": site.url, "description": site.description, "offices": offices, "services": svc, "posts": posts, "homeKeyword": site.seo_home_keyword } | dump | safe }}

@@ -3,16 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-{% set pageTitle = (title + " · " + site.title) if title else site.title %}
-{% set pageDesc = description or excerpt or site.description %}
+{% if seo_title %}{% set pageTitle = seo_title %}{% elif page.url == "/" %}{% set pageTitle = site.title + " | " + (site.seo_home_title or site.description) %}{% elif title %}{% set pageTitle = title + " | " + site.title %}{% else %}{% set pageTitle = site.title %}{% endif %}
+{% set pageDesc = meta_description or description or excerpt or site.description %}
+{% set pageUrl = page.url | absoluteUrl(site.url) %}
+{% set pageImage = (cover or '/img/og-default.png') | absoluteUrl(site.url) %}
 <title>{{ pageTitle }}</title>
 <meta name="description" content="{{ pageDesc }}">
-<link rel="canonical" href="{{ page.url | absoluteUrl(site.url) }}">
+{% if noindex %}<meta name="robots" content="noindex">{% endif %}
+{% set focusKw = focus_keyword or (site.seo_home_keyword if page.url == "/" else "") %}{% if focusKw %}<meta name="seo:focus" content="{{ focusKw }}">{% endif %}
+{% if site.google_verification %}<meta name="google-site-verification" content="{{ site.google_verification }}">{% endif %}
+<link rel="canonical" href="{{ pageUrl }}">
+<meta property="og:site_name" content="{{ site.title }}">
 <meta property="og:type" content="{{ 'article' if layout == 'layouts/post.njk' else 'website' }}">
 <meta property="og:title" content="{{ pageTitle }}">
 <meta property="og:description" content="{{ pageDesc }}">
-<meta property="og:url" content="{{ page.url | absoluteUrl(site.url) }}">
-<meta property="og:image" content="{{ (cover or '/assets/img/aqlyon-logo.png') | absoluteUrl(site.url) }}">
+<meta property="og:url" content="{{ pageUrl }}">
+<meta property="og:image" content="{{ pageImage }}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#0B0B0B">
 <link rel="icon" type="image/png" href="/favicon.png">
@@ -21,7 +27,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="/assets/css/site.css?v={{ build.v }}">
 {% if eventsModule %}<link rel="stylesheet" href="/site/events.css?v={{ build.v }}">{% endif %}
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":{{ site.title | dump | safe }},"url":{{ site.url | dump | safe }},"logo":{{ ('/assets/img/aqlyon-logo.png' | absoluteUrl(site.url)) | dump | safe }},"email":{{ site.email | dump | safe }},"sameAs":[{{ site.social.instagram | dump | safe }},{{ site.social.facebook | dump | safe }},{{ site.social.linkedin | dump | safe }},{{ site.social.youtube | dump | safe }}]}</script>
+{% include "partials/schema.njk" %}
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>

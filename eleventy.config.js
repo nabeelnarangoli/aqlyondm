@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { buildSeoReport } from "./scripts/seo-report.mjs";
+
 export default function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/assets");
   eleventyConfig.addPassthroughCopy("src/uploads");
@@ -42,6 +45,13 @@ export default function (eleventyConfig) {
   eleventyConfig.addFilter("letters", (s) => String(s || "").split(""));
   eleventyConfig.addFilter("absoluteUrl", (path, base) => {
     try { return new URL(path, base).toString(); } catch { return path; }
+  });
+
+  // Whole-site SEO report for the dashboard at /seo (written to _site/seo/report.json)
+  eleventyConfig.on("eleventy.after", async ({ results, dir }) => {
+    const site = JSON.parse(readFileSync("src/_data/site.json", "utf8"));
+    const r = await buildSeoReport(results, dir.output, site);
+    console.log(`[seo] ${r.summary.pages} pages checked, average score ${r.summary.avg}`);
   });
 
   return {

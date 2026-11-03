@@ -1,0 +1,16 @@
+---
+permalink: /robots.txt
+eleventyExcludeFromCollections: true
+---
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /manage
+Disallow: /seo
+Disallow: /checkin
+Disallow: /send
+Disallow: /badge/
+Disallow: /api/
+Disallow: /thanks/
+
+Sitemap: {{ "/sitemap.xml" | absoluteUrl(site.url) }}

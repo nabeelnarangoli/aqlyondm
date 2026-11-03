@@ -32,6 +32,28 @@ Event photo galleries from `/admin` now live at `/gallery/<event-name>/` and are
 
 **Test it on your own computer:** run `npm run build`, then `ADMIN_PASSWORD=test123 npm run dev`, and open http://localhost:8888/manage. Test data is saved in `.data/`.
 
+## SEO assistant (/seo)
+
+Log in at **/seo** with the same `ADMIN_PASSWORD` as /manage.
+
+- **Overview & Pages**: every deploy checks all public pages (title and description length, focus keyword use, headings, alt text, links, readability, canonical and share image, broken links, duplicates) and scores them out of 100. Built by `scripts/seo-report.mjs` into `/seo/report.json`.
+- **Live post checker**: in /admin, the preview pane of a blog post shows its score, a Google result preview and what to fix while you type. Fill in the post's *SEO · Focus keyword* to get all the checks.
+- **Search Console**: clicks, impressions, average position, top searches and pages, and "quick wins" (searches where you're on page 1–2 but not the top).
+- **AI assistant**: keyword ideas, blog post ideas, full blog drafts, titles and meta descriptions, page improvement suggestions and a 30-day plan (limit 150 requests a day).
+- **Action plan**: the off-site checklist (Google Business Profiles, reviews, directories, links).
+- Also generated on every deploy: `sitemap.xml`, `robots.txt`, and structured data for the business, both offices and each blog post.
+
+**Connect Google Search Console (once):**
+1. Add and verify the site in Search Console (a Domain property for `aqlyondm.com` is best). For the HTML-tag method, paste the code into /admin → Site content → Contact details → *Google Search Console verification code*, and deploy.
+2. In Google Cloud Console, create a project and enable **Google Search Console API**.
+3. IAM & Admin → Service accounts → create one → Keys → Add key → JSON.
+4. In Search Console → Settings → Users and permissions, add the service account's email with **Restricted** permission.
+5. In /seo → Settings, paste the JSON file's contents and the property (`sc-domain:aqlyondm.com`), then save.
+
+**Connect the AI assistant:** create an API key at console.anthropic.com (with billing set up) and paste it in /seo → Settings.
+
+Keys are stored in Netlify Blobs and never sent back to the browser. You can set them as environment variables instead: `GSC_SERVICE_ACCOUNT`, `GSC_SITE_URL`, `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`.
+
 ## Branches
 
 - **`staging`**: all code and design changes land here first and get a Netlify preview.

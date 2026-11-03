@@ -3,6 +3,7 @@
 // Storage is any object with get(key,{type:'json'}), setJSON(key,value), delete(key), list() — Netlify Blobs in production.
 import crypto from 'node:crypto';
 import { createEvents } from './events.mjs';
+import { createSeo } from './seo.mjs';
 
 const MAX_BODY = 300_000;
 const json = (status, body) => new Response(JSON.stringify(body), {
@@ -41,6 +42,7 @@ export function createHandler({ getStore, env }) {
   };
 
   const EV = createEvents({ getStore, json });
+  const SEO = createSeo({ getStore, json, env });
 
   return async function handle(req) {
     const { admin, secret } = cfg();
@@ -77,6 +79,11 @@ export function createHandler({ getStore, env }) {
         }
         await meta.setJSON('admin-attempts', { fails: 0, lockUntil: 0 });
         return json(200, { token: sign({ r: 'admin', exp: Date.now() + (body.remember ? 14 * 864e5 : 12 * 36e5) }, secret) });
+      }
+      if (path.startsWith('/seo/')) {
+        if (!auth || auth.r !== 'admin') return json(401, { error: 'Admin login needed.' });
+        const r = await SEO.routes({ path, method, body: method === 'GET' ? Object.fromEntries(url.searchParams) : body });
+        if (r) return r;
       }
       const evr = await EV.routes({ path, method, body, req, auth });
       if (evr) return evr;
