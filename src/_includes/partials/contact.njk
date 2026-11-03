@@ -6,9 +6,14 @@
         <h2>{{ home.contact.heading_line1 }}<br><span>{{ home.contact.heading_line2 }}</span></h2>
         <div class="contact-lines">
           {% for o in site.offices %}
-          <div><p>{{ o.label }}</p><a href="https://wa.me/{{ o.phone | waDigits }}">{{ o.phone }}</a></div>
+          <div class="office">
+            <p>{{ o.label }}</p>
+            <b>{{ o.company }}</b>
+            {% if o.address %}<address>{{ o.address }}</address>{% endif %}
+            <a href="https://wa.me/{{ o.phone | waDigits }}">{{ o.phone }}</a>
+          </div>
           {% endfor %}
-          <div><p>Email</p><a href="mailto:{{ site.email }}">{{ site.email }}</a></div>
+          <div class="office email"><p>Email</p><a href="mailto:{{ site.email }}">{{ site.email }}</a></div>
         </div>
       </div>
       <form class="callback" name="callback" method="POST" action="/thanks/" data-netlify="true" netlify-honeypot="company">

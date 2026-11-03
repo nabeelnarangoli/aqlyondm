@@ -191,10 +191,11 @@ collections:
           - label: Offices
             name: offices
             widget: list
-            summary: "{{fields.label}} — {{fields.phone}}"
+            summary: "{{fields.label}} — {{fields.company}}"
             fields:
-              - { label: Place, name: label, widget: string }
+              - { label: Region label, name: label, widget: string, hint: "Small heading, e.g. UAE or Kerala" }
               - { label: Company name, name: company, widget: string }
+              - { label: Address, name: address, widget: text, required: false }
               - { label: Phone / WhatsApp, name: phone, widget: string }
           - label: Social links
             name: social
