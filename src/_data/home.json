@@ -12,27 +12,138 @@
   "journey": {
     "heading": "Your journey with Aqlyon",
     "chapters": [
-      { "kicker": "Day one", "title": "You start a company.", "body": "Every big brand begins as an idea. We help you shape it — a name, a position and a brand strategy built to grow.", "tag": "Brand strategy & naming" },
-      { "kicker": "Identity", "title": "Your logo is born.", "body": "A mark people remember, with colours, type and a voice that feel unmistakably yours.", "tag": "Logo & visual identity" },
-      { "kicker": "Assets", "title": "Every touchpoint, ready.", "body": "Website visuals, business cards, social kits and print — one consistent brand everywhere you show up.", "tag": "Graphic design & digital assets" },
-      { "kicker": "Content", "title": "Stories that stop the scroll.", "body": "Explainer videos, reels, photography and brand films that make people feel something.", "tag": "Explainer videos · Photo & video" },
-      { "kicker": "Community", "title": "An audience that grows.", "body": "Planned posts, real conversations and monthly analytics — your social channels, fully managed.", "tag": "Social media management" },
-      { "kicker": "Growth", "title": "Leads start flowing.", "body": "Targeted campaigns turn attention into enquiries — the right people, asking about you.", "tag": "Digital marketing & lead generation" },
-      { "kicker": "Every day", "title": "Sales, day after day.", "body": "Launches, events and always-on marketing keep customers coming back. And we stay right beside you.", "tag": "Event media & brand management" }
+      {
+        "kicker": "Day one",
+        "title": "You start a company.",
+        "body": "Every big brand begins as an idea. We help you shape it — a name, a position and a brand strategy built to grow.",
+        "tag": "Brand strategy & naming"
+      },
+      {
+        "kicker": "Identity",
+        "title": "Your logo is born.",
+        "body": "A mark people remember, with colours, type and a voice that feel unmistakably yours.",
+        "tag": "Logo & visual identity"
+      },
+      {
+        "kicker": "Assets",
+        "title": "Every touchpoint, ready.",
+        "body": "Website visuals, business cards, social kits and print — one consistent brand everywhere you show up.",
+        "tag": "Graphic design & digital assets"
+      },
+      {
+        "kicker": "Content",
+        "title": "Stories that stop the scroll.",
+        "body": "Explainer videos, reels, photography and brand films that make people feel something.",
+        "tag": "Explainer videos · Photo & video"
+      },
+      {
+        "kicker": "Community",
+        "title": "An audience that grows.",
+        "body": "Planned posts, real conversations and monthly analytics — your social channels, fully managed.",
+        "tag": "Social media management"
+      },
+      {
+        "kicker": "Growth",
+        "title": "Leads start flowing.",
+        "body": "Targeted campaigns turn attention into enquiries — the right people, asking about you.",
+        "tag": "Digital marketing & lead generation"
+      },
+      {
+        "kicker": "Every day",
+        "title": "Sales, day after day.",
+        "body": "Launches, events and always-on marketing keep customers coming back. And we stay right beside you.",
+        "tag": "Event media & brand management"
+      }
     ]
   },
   "services": {
     "heading": "Everything, one studio.",
     "intro": "Seven crafts working together, so every step of your journey feels like one brand.",
     "items": [
-      { "title": "Branding", "summary": "Strategy, logo, identity, voice." },
-      { "title": "Explainer Videos", "summary": "2D and 3D animated explainers." },
-      { "title": "Event Media", "summary": "Live coverage and recap films." },
-      { "title": "Content Creation", "summary": "Reels, posts, photography, blogs." },
-      { "title": "Graphic Design", "summary": "Social graphics and print." },
-      { "title": "Photo & Video", "summary": "Product shoots and brand films." },
-      { "title": "Social & Leads", "summary": "Management, ads and lead generation." }
-    ]
+      {
+        "title": "Branding",
+        "summary": "Strategy, logo, identity, voice.",
+        "details": "Branding is more than visuals. We help growing businesses and individuals craft an identity that reflects their values, vision and voice, so your brand makes a lasting impression and leads in a competitive digital space.",
+        "includes": [
+          "Custom brand strategy for your mission, goals and audience",
+          "Logo design and complete visual identity",
+          "Personal and corporate branding",
+          "Consistent presence across social media and your website",
+          "Brand messaging and tone of voice"
+        ]
+      },
+      {
+        "title": "Explainer Videos",
+        "summary": "2D and 3D animated explainers.",
+        "details": "Explainer videos that inform and inspire action. We create 2D and 3D animated videos that make even complex ideas easy to understand, capture attention and leave a lasting impression.",
+        "includes": [
+          "Product launches and promotions",
+          "Service showcases and brand storytelling",
+          "Educational and training content",
+          "Marketing campaigns and social media animations",
+          "Startup pitches and investor presentations"
+        ]
+      },
+      {
+        "title": "Event Media",
+        "summary": "Live coverage and recap films.",
+        "details": "We turn your event into a powerful digital experience before, during and after it happens, so it reaches people far beyond the venue.",
+        "includes": [
+          "Live social media coverage",
+          "Real-time graphics, videos, stories and updates",
+          "Professional photography and cinematic videography",
+          "Post-event recap videos, albums and posts"
+        ]
+      },
+      {
+        "title": "Content Creation",
+        "summary": "Reels, posts, photography, blogs.",
+        "details": "Powerful content is the foundation of digital marketing. We create high-quality content that grabs attention, builds trust and is shaped for the platform it lives on.",
+        "includes": [
+          "Visuals, copy, photography and edited videos in your brand voice",
+          "Platform-specific content for Instagram, Facebook, LinkedIn and your website",
+          "Short-form reels to long-form blog posts",
+          "SEO-friendly writing planned for performance",
+          "Content for paid campaigns"
+        ]
+      },
+      {
+        "title": "Graphic Design",
+        "summary": "Social graphics and print.",
+        "details": "Visuals that carry your brand identity in every piece, from your daily social posts to the materials you hand to customers.",
+        "includes": [
+          "Social media graphics and post designs",
+          "Marketing and print materials: brochures, flyers, banners",
+          "Illustrations",
+          "Branding elements and templates"
+        ]
+      },
+      {
+        "title": "Photo & Video",
+        "summary": "Product shoots and brand films.",
+        "details": "Photography and video made for digital platforms, so your products, events and story look their best wherever people see them.",
+        "includes": [
+          "Product photography",
+          "Event coverage",
+          "Brand storytelling films",
+          "Edits optimised for each platform"
+        ]
+      },
+      {
+        "title": "Social & Leads",
+        "summary": "Management, ads and lead generation.",
+        "details": "We manage your social presence and turn attention into enquiries, with content, community, analytics and campaigns working together.",
+        "includes": [
+          "Content creation and strategic scheduling",
+          "Community management",
+          "Performance analytics and monthly reports",
+          "Audience growth",
+          "Ad campaign planning and lead generation",
+          "Conversion optimisation"
+        ]
+      }
+    ],
+    "popup_contact_heading": "Talk to us about this"
   },
   "clients_heading": "Brands we've worked with",
   "testimonials_heading": "What our clients say",

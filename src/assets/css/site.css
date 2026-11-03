@@ -121,13 +121,13 @@ h1,h2,h3{font-family:var(--display);letter-spacing:-.035em;line-height:1;margin:
 
 /* ---------- services bento ---------- */
 .bento{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));grid-auto-rows:260px;gap:16px}
-.tile{position:relative;overflow:hidden;border-radius:var(--radius);padding:24px;display:flex;flex-direction:column;justify-content:space-between;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.tile{position:relative;overflow:hidden;border-radius:var(--radius);padding:24px;border:0;font:inherit;color:var(--ink);text-align:left;cursor:pointer;width:100%;display:flex;flex-direction:column;justify-content:space-between;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
 .tile:hover{transform:scale(1.025) rotate(-.4deg)}
 .tile .num{position:relative;font-weight:600;font-size:14px}
-.tile h3{position:relative;font-weight:700;font-size:24px;letter-spacing:-.02em;line-height:1.1}
+.tile .h3{display:block;font-family:var(--display);position:relative;font-weight:700;font-size:24px;letter-spacing:-.02em;line-height:1.1}
 .tile .sum{position:relative;display:block;margin-top:8px;font-size:15px}
 .tile.big{grid-row:span 2;padding:30px}
-.tile.big h3{font-size:40px;letter-spacing:-.03em}
+.tile.big .h3{font-size:40px;letter-spacing:-.03em}
 .tile.big .sum{padding-right:64px}
 .tile .go{position:absolute;right:26px;bottom:26px;width:48px;height:48px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
 .tile:hover .go{transform:rotate(-45deg) scale(1.1)}
@@ -299,3 +299,38 @@ h1,h2,h3{font-family:var(--display);letter-spacing:-.035em;line-height:1;margin:
 .upcoming .evnone{margin:0}
 .upcoming .evc h3{font-family:var(--display);letter-spacing:-.02em}
 .upcoming .evpast summary{font-family:var(--display);font-size:20px}
+
+/* ---------- service popup ---------- */
+.tile:not(.big) .go{width:40px;height:40px;right:20px;bottom:20px;font-size:17px;opacity:0;transform:translateY(8px)}
+.tile:not(.big):hover .go,.tile:not(.big):focus-visible .go{opacity:1;transform:rotate(-45deg)}
+.tile[style*="#0B0B0B"] .go{background:#fff;color:var(--ink)}
+body.svc-open{overflow:hidden}
+.svc-dialog{width:min(720px,calc(100vw - 24px));max-height:calc(100vh - 32px);padding:0;border:0;border-radius:32px;background:#fff;color:var(--ink);overflow:auto;box-shadow:0 40px 80px -30px rgba(0,0,0,.5)}
+.svc-dialog::backdrop{background:rgba(11,11,11,.6);backdrop-filter:blur(4px)}
+.svc-dialog[open]{animation:svcIn .45s cubic-bezier(.2,.9,.2,1)}
+.svc-dialog[open]::backdrop{animation:fadeBg .3s ease}
+@keyframes svcIn{from{opacity:0;transform:translateY(40px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes fadeBg{from{opacity:0}to{opacity:1}}
+.svc-head{position:relative;padding:34px 34px 30px}
+.svc-head .num{font-size:14px;font-weight:600;opacity:.75}
+.svc-head h3{margin-top:14px;font-size:clamp(34px,6vw,52px);letter-spacing:-.04em}
+.svc-head p{margin:10px 0 0;font-size:17px;opacity:.85}
+.svc-close{position:absolute;right:20px;top:20px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.85);color:var(--ink);font-size:18px;cursor:pointer;transition:transform .3s}
+.svc-close:hover{transform:rotate(90deg)}
+.svc-body{padding:28px 34px 34px}
+.svc-lead{margin:0;font-size:18px;line-height:1.65;color:var(--ink-2)}
+.svc-body h4{margin:28px 0 12px;font-family:var(--display);font-size:20px;letter-spacing:-.02em}
+.svc-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.svc-list li{position:relative;padding-left:32px;font-size:16px;line-height:1.5}
+.svc-list li::before{content:"";position:absolute;left:0;top:2px;width:20px;height:20px;border-radius:50%;background:var(--green) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230B0B0B' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/12px no-repeat}
+.svc-contact{margin-top:30px;padding:24px;border-radius:24px;background:var(--paper)}
+.svc-contact h4{margin-top:0}
+.svc-offices{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.svc-office{display:flex;flex-direction:column;gap:3px;padding:16px 18px;border-radius:18px;background:#fff;transition:transform .3s,box-shadow .3s}
+.svc-office:hover{transform:translateY(-3px);box-shadow:0 14px 28px -18px rgba(0,0,0,.35)}
+.svc-office small{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--green-text)}
+.svc-office b{font-size:16px}
+.svc-office span{font-size:15px;color:var(--ink-2)}
+.svc-actions{margin-top:14px;display:flex;flex-wrap:wrap;gap:10px}
+.svc-actions .btn{min-height:44px;padding:11px 20px;font-size:15px}
+@media (max-width:560px){.svc-head{padding:28px 22px 24px}.svc-body{padding:22px 22px 26px}.svc-contact{padding:18px}.svc-dialog{border-radius:24px}}

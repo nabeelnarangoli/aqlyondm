@@ -79,6 +79,27 @@
     });
   }
 
+  /* ---------- service popups ---------- */
+  document.querySelectorAll("[data-service]").forEach(function (tile) {
+    var dlg = document.getElementById("svc-" + tile.getAttribute("data-service"));
+    if (!dlg || typeof dlg.showModal !== "function") return;
+    tile.addEventListener("click", function () { dlg.showModal(); document.body.classList.add("svc-open"); });
+    dlg.addEventListener("close", function () { document.body.classList.remove("svc-open"); tile.focus({ preventScroll: true }); });
+    dlg.addEventListener("click", function (e) {
+      if (e.target === dlg || e.target.closest("[data-close]")) dlg.close();
+      var cb = e.target.closest("[data-callback]");
+      if (cb) {
+        e.preventDefault(); dlg.close();
+        var form = document.querySelector("form.callback"), sel = form && form.querySelector("select[name=interest]");
+        if (sel) sel.value = cb.getAttribute("data-callback");
+        var target = document.getElementById("contact");
+        if (target) target.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+        var nameInput = form && form.querySelector("input[name=name]");
+        if (nameInput) setTimeout(function () { nameInput.focus({ preventScroll: true }); }, reduce ? 0 : 700);
+      }
+    });
+  });
+
   /* ---------- event gallery lightbox ---------- */
   var gallery = document.querySelector("[data-gallery]");
   var lb = document.querySelector("[data-lightbox]");

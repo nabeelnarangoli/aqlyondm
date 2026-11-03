@@ -157,6 +157,7 @@ collections:
             fields:
               - { label: Heading, name: heading, widget: string }
               - { label: Intro, name: intro, widget: text }
+              - { label: Popup contact heading, name: popup_contact_heading, widget: string, required: false }
               - label: Service tiles
                 name: items
                 widget: list
@@ -167,6 +168,8 @@ collections:
                 fields:
                   - { label: Title, name: title, widget: string }
                   - { label: Short description, name: summary, widget: string, required: false }
+                  - { label: Popup text, name: details, widget: text, required: false, hint: "Shown when someone clicks the tile." }
+                  - { label: "What's included", name: includes, widget: list, required: false, field: { label: Item, name: item, widget: string } }
           - { label: Client logos heading, name: clients_heading, widget: string }
           - { label: Testimonials heading, name: testimonials_heading, widget: string }
           - { label: Events heading, name: events_heading, widget: string }

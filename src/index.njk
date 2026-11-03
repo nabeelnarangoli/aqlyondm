@@ -92,16 +92,52 @@ eventsModule: true
     <div class="bento">
       {% for s in home.services.items %}
       {% set i = loop.index0 %}
-      <a class="tile{% if i == 0 %} big{% endif %}" href="https://wa.me/{{ site.whatsapp | waDigits }}?text={{ ('Hi Aqlyon, I would like to know more about ' + s.title) | urlencode }}" style="background:{{ tileBg[i % 7] }};{% if i == 1 %}color:#fff;{% endif %}">
+      <button type="button" class="tile{% if i == 0 %} big{% endif %}" data-service="{{ i }}" aria-haspopup="dialog" aria-controls="svc-{{ i }}" style="background:{{ tileBg[i % 7] }};{% if i == 1 %}color:#fff;{% endif %}">
         {% include "partials/service-decor.njk" %}
         <span class="num"{% if i == 1 %} style="color:#B5B5B5"{% endif %}>{{ loop.index | pad2 }}</span>
         <span>
-          <h3>{{ s.title }}</h3>
+          <span class="h3">{{ s.title }}</span>
           {% if s.summary and (i == 0 or i >= 5) %}<span class="sum">{{ s.summary }}</span>{% endif %}
         </span>
-        {% if i == 0 %}<span class="go" aria-hidden="true">→</span>{% endif %}
-      </a>
+        <span class="go" aria-hidden="true">→</span>
+      </button>
       {% endfor %}
+    </div>
+    {% for s in home.services.items %}
+    {% set i = loop.index0 %}
+    {% set waText = 'Hi Aqlyon, I would like to know more about ' + s.title + '.' %}
+    <dialog class="svc-dialog" id="svc-{{ i }}" aria-labelledby="svc-{{ i }}-t">
+      <div class="svc-head" style="background:{{ "#E3F5EC" if tileBg[i % 7] == "#FFFFFF" else tileBg[i % 7] }};{% if i == 1 %}color:#fff;{% endif %}">
+        <span class="num">{{ loop.index | pad2 }} / {{ home.services.items.length | pad2 }}</span>
+        <h3 id="svc-{{ i }}-t">{{ s.title }}</h3>
+        {% if s.summary %}<p>{{ s.summary }}</p>{% endif %}
+        <button type="button" class="svc-close" data-close aria-label="Close">✕</button>
+      </div>
+      <div class="svc-body">
+        {% if s.details %}<p class="svc-lead">{{ s.details }}</p>{% endif %}
+        {% if s.includes and s.includes.length %}
+        <h4>What's included</h4>
+        <ul class="svc-list">{% for it in s.includes %}<li>{{ it }}</li>{% endfor %}</ul>
+        {% endif %}
+        <div class="svc-contact">
+          <h4>{{ home.services.popup_contact_heading or "Talk to us about this" }}</h4>
+          <div class="svc-offices">
+            {% for o in site.offices %}
+            <a class="svc-office" href="https://wa.me/{{ o.phone | waDigits }}?text={{ waText | urlencode }}" rel="noopener">
+              <small>{{ o.label }} · WhatsApp</small>
+              <b>{{ o.company }}</b>
+              <span>{{ o.phone }}</span>
+            </a>
+            {% endfor %}
+          </div>
+          <div class="svc-actions">
+            <a class="btn btn-dark" href="#contact" data-callback="{{ s.title }}">Request a call back</a>
+            <a class="btn btn-white" href="mailto:{{ site.email }}?subject={{ ('Enquiry: ' + s.title) | urlencode }}">Email {{ site.email }}</a>
+          </div>
+        </div>
+      </div>
+    </dialog>
+    {% endfor %}
     </div>
   </div>
 </section>

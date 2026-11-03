@@ -26,11 +26,7 @@
         <label>Phone or WhatsApp<input name="phone" type="tel" required autocomplete="tel"></label>
         <label>What do you need?
           <select name="interest">
-            <option>Branding &amp; logo</option>
-            <option>Explainer video</option>
-            <option>Event media coverage</option>
-            <option>Content &amp; social media</option>
-            <option>Ads &amp; lead generation</option>
+            {% for sv in home.services.items %}<option>{{ sv.title }}</option>{% endfor %}
             <option>Something else</option>
           </select>
         </label>
