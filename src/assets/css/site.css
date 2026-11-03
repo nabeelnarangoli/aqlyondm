@@ -185,6 +185,7 @@ h1,h2,h3{font-family:var(--display);letter-spacing:-.035em;line-height:1;margin:
 .contact-lines a:hover{color:var(--green)}
 .contact-lines .office{flex:1 1 220px;max-width:300px;display:flex;flex-direction:column;align-items:flex-start}
 .contact-lines .office p{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+.contact-lines .office-logo{margin:14px 0 6px;height:64px;width:auto;max-width:200px;object-fit:contain;object-position:left center}
 .contact-lines .office b{margin-top:8px;font-family:var(--display);font-size:20px;line-height:1.25;letter-spacing:-.01em}
 .contact-lines .office address{margin-top:6px;font-style:normal;font-size:15px;line-height:1.5;color:#C9CBC4}
 .contact-lines .office a{margin-top:8px}

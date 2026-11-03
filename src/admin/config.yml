@@ -194,6 +194,7 @@ collections:
             summary: "{{fields.label}} — {{fields.company}}"
             fields:
               - { label: Region label, name: label, widget: string, hint: "Small heading, e.g. UAE or Kerala" }
+              - { label: Logo, name: logo, widget: image, required: false, hint: "Shown on the dark contact section, so use a version with light or green colours on a transparent background." }
               - { label: Company name, name: company, widget: string }
               - { label: Address, name: address, widget: text, required: false }
               - { label: Phone / WhatsApp, name: phone, widget: string }
