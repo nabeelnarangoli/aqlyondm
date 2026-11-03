@@ -2,8 +2,8 @@
    Shared by the admin (writing / previewing the message) and the helper's send page. */
 const WA_TAGS=[['{first name}','First name'],['{name}','Full name'],['{event}','Event name'],['{date}','Date and time'],['{venue}','Place'],['{map}','Map link'],['{badge}','Badge link'],['{ref}','Reference'],['{people}','Number of people'],['{join}','Online joining link'],['{event page}','Event page']];
 function waDefault(online){return online
- ?`Hello {first name} 👋\nYour registration for *{event}* is confirmed ✅\n\n📅 {date}\n💻 Online · join here: {join}\n🔖 Ref: {ref}\n\nSee you there!\n– Aqlyon Digital Marketing`
- :`Hello {first name} 👋\nYour registration for *{event}* is confirmed ✅\n\n📅 {date}\n📍 {venue} {map}\n🎫 Your entry badge (show the QR code at the entrance): {badge}\n🔖 Ref: {ref}{people}\n\nSee you there!\n– Aqlyon Digital Marketing`}
+ ?`Hello {first name} 👋\nYour registration for *{event}* is confirmed ✅\n\n📅 {date}\n💻 Online · join here: {join}\n🔖 Ref: {ref}\n\nSee you there!\n– Aqlyon Brand Management`
+ :`Hello {first name} 👋\nYour registration for *{event}* is confirmed ✅\n\n📅 {date}\n📍 {venue} {map}\n🎫 Your entry badge (show the QR code at the entrance): {badge}\n🔖 Ref: {ref}{people}\n\nSee you there!\n– Aqlyon Brand Management`}
 function waFill(tpl,ev,p){
  const v={'{first name}':String(p.name||'').trim().split(/\s+/)[0],'{name}':p.name||'','{event}':ev.title||'','{date}':ev.when||'','{venue}':ev.venue||'','{map}':ev.mapUrl||'',
   '{badge}':p.badge||'','{ref}':p.ref||'','{people}':p.seats>1?` · ${p.seats} people`:'','{join}':ev.join||'','{event page}':ev.page||''};

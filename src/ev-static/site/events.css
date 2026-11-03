@@ -145,7 +145,7 @@
 .rgf .ddnone{padding:10px 12px;color:#6B7B74;font-size:14px}
 .rgf .ddnone[hidden]{display:none}
 
-/* Aqlyon Digital Marketing header */
-.evtop .dmbrand{display:flex;align-items:center;padding:10px 20px;border-radius:999px;background:#fff}
-.evtop .dmbrand img{height:32px;width:auto;display:block}
+/* Aqlyon Brand Management header */
+.evtop .dmbrand{display:flex;align-items:center;gap:10px;padding:8px 18px 8px 10px;border-radius:999px;background:#fff}
+.evtop .dmbrand img{height:34px;width:auto;display:block}
 .events .evtitle h2{font-family:var(--disp);letter-spacing:-.045em;line-height:.95}

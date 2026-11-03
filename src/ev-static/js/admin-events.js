@@ -34,7 +34,7 @@ function renderEvents(){
   <div class="evbtns"><button type="button" class="btn sm" data-ev="edit" data-id="${e.id}">Edit</button>${e.regMode==='form'?`<button type="button" class="btn sm ghost" data-ev="regs" data-id="${e.id}">Registrations</button>`:''}${e.regMode!=='none'&&e.state!=='ended'?`<button type="button" class="btn sm ghost" data-ev="toggle" data-id="${e.id}">${e.regOpen?'Close registration':'Open registration'}</button>`:''}${e.regMode==='form'&&e.mode!=='online'&&e.counts.total?`<button type="button" class="btn sm ghost" data-ev="scan" data-id="${e.id}">📷 Check-in${e.counts.attended?` (${e.counts.attended})`:''}</button>`:''}<button type="button" class="btn sm ghost" data-ev="copy" data-id="${e.id}">Copy link</button><a class="btn sm ghost" href="/events/${esc(e.slug)}" target="_blank" rel="noopener">View page ↗</a></div></div></article>`};
  const t=e=>Date.parse(e.start+':00');const up=EVENTS.filter(e=>e.state!=='ended').sort((a,b)=>t(a)-t(b)),past=EVENTS.filter(e=>e.state==='ended').sort((a,b)=>t(b)-t(a));
  main.innerHTML=`<div class="admhead"><h1>Events</h1><button type="button" class="btn" id="newev">＋ New event</button></div>
- <div class="calbar ${EVSET.calUrl&&!EVSET.calNeedsUpdate?'on':EVSET.calNeedsUpdate?'warn':''}"><span class="calic">📅</span><div><b>Calendar invitations ${EVSET.calNeedsUpdate?'need a quick update':EVSET.calUrl?'on':'off'}</b><small>${EVSET.calNeedsUpdate?'Switch to our own invitation email (“Invitation from Aqlyon Digital Marketing: event name”). Takes 2 minutes.':EVSET.calUrl?`Emailed from ${esc(EVSET.calEmail||'your Google account')} as “Invitation from Aqlyon Digital Marketing: <i>event name</i>”, with the event attached for their calendar.`:'Connect so everyone who registers gets an invitation email with the event for their calendar.'}</small></div><button type="button" class="btn sm ${EVSET.calUrl&&!EVSET.calNeedsUpdate?'ghost':''} calsetup">${EVSET.calNeedsUpdate?'Update now':EVSET.calUrl?'Settings':'Connect'}</button></div>
+ <div class="calbar ${EVSET.calUrl&&!EVSET.calNeedsUpdate?'on':EVSET.calNeedsUpdate?'warn':''}"><span class="calic">📅</span><div><b>Calendar invitations ${EVSET.calNeedsUpdate?'need a quick update':EVSET.calUrl?'on':'off'}</b><small>${EVSET.calNeedsUpdate?'Switch to our own invitation email (“Invitation from Aqlyon Brand Management: event name”). Takes 2 minutes.':EVSET.calUrl?`Emailed from ${esc(EVSET.calEmail||'your Google account')} as “Invitation from Aqlyon Brand Management: <i>event name</i>”, with the event attached for their calendar.`:'Connect so everyone who registers gets an invitation email with the event for their calendar.'}</small></div><button type="button" class="btn sm ${EVSET.calUrl&&!EVSET.calNeedsUpdate?'ghost':''} calsetup">${EVSET.calNeedsUpdate?'Update now':EVSET.calUrl?'Settings':'Connect'}</button></div>
  <details class="evset"><summary><b>Event settings</b> · WhatsApp for approvals: ${esc(EVSET.whatsapp)}</summary>
   <form class="mform evsetform"><div class="field"><label for="es-wa">WhatsApp number for paid registrations</label><input id="es-wa" value="${esc(EVSET.whatsapp)}" inputmode="tel"><small class="small">Visitors who register for a paid event send their details to this number for payment and approval. Include the country code.</small></div>
   <p class="fbsub">Common WhatsApp message</p><p class="small">Used for every event that doesn't have its own message (set one in the event's <b>WhatsApp message</b> section). It's the confirmation sent from the WhatsApp lists and the <b>Send details on WhatsApp</b> button.</p>
@@ -45,7 +45,7 @@ function renderEvents(){
  ${past.length?`<h2 class="evh">Past</h2><div class="evlist past">${past.map(card).join('')}</div>`:''}`;
  $('#newev').onclick=()=>eventForm();
  $('.calsetup').onclick=calSetup;
- const sampleEv=EVENTS.find(x=>x.mode==='offline')||EVENTS[0]||{title:'Your event name',start:new Date(Date.now()+7*864e5).toISOString().slice(0,10)+'T10:00',tz:'Asia/Dubai',mode:'offline',locationName:'Aqlyon Digital Marketing, Dubai'};
+ const sampleEv=EVENTS.find(x=>x.mode==='offline')||EVENTS[0]||{title:'Your event name',start:new Date(Date.now()+7*864e5).toISOString().slice(0,10)+'T10:00',tz:'Asia/Dubai',mode:'offline',locationName:'Aqlyon Brand Management, Koyilandy'};
  const sampleOn=EVENTS.find(x=>x.mode==='online')||{...sampleEv,mode:'online',onlineUrl:'https://meet.google.com/abc-defg-hij'};
  const WC=[0,1].map(o=>waEditor($(`.wacommon[data-on="${o}"]`),{value:waCommon(EVSET,!!o),online:!!o,ev:waEvent(o?sampleOn:sampleEv),person:WA_SAMPLE,id:'es-wa'+o,label:o?'For online events':'For in-person events'}));
  $$('.wareset').forEach(b=>b.onclick=()=>WC[+b.dataset.on].set(waDefault(!!+b.dataset.on)));
@@ -77,7 +77,7 @@ function eventForm(e){
  <div class="field"><label>Cover photo</label><div class="evcover"><div class="evcprev">${e.cover?`<img src="/api/img/${e.cover}" alt="">`:'<span>No cover yet</span>'}</div><div><input type="file" id="ef-cover" accept="image/jpeg,image/png,image/webp"><small class="small">Best size: 1600 × 900 (16:9). It is also used when the event link is shared on WhatsApp or social media.</small>${e.cover?'<button type="button" class="linkbtn rmcover">Remove cover</button>':''}</div></div></div>
  <fieldset class="qset"><legend>Date and time *</legend><div class="f3"><div class="field"><label for="ef-start">Starts</label><input type="datetime-local" id="ef-start" required value="${esc(e.start||'')}"></div><div class="field"><label for="ef-end">Ends <small>(optional)</small></label><input type="datetime-local" id="ef-end" value="${esc(e.end||'')}"></div><div class="field"><label for="ef-tz">Time zone</label><select id="ef-tz">${EV_TZ.map(([v,t])=>`<option value="${v}" ${e.tz===v?'selected':''}>${t}</option>`).join('')}</select></div></div></fieldset>
  <fieldset class="qset"><legend>Where</legend><div class="rrow">${r('mode','offline',e.mode,'Offline (at a place)')}${r('mode','online',e.mode,'Online')}</div>
-  <div class="m-off"><div class="field"><label for="ef-loc">Location *</label><input id="ef-loc" maxlength="160" value="${esc(e.locationName||'')}" placeholder="e.g. Aqlyon Digital Marketing, Dubai"></div><div class="field"><label for="ef-map">Google Maps link</label><input id="ef-map" maxlength="600" value="${esc(e.mapUrl||'')}" placeholder="https://maps.app.goo.gl/…"><small class="small">In Google Maps: find the place → Share → Copy link.</small></div></div>
+  <div class="m-off"><div class="field"><label for="ef-loc">Location *</label><input id="ef-loc" maxlength="160" value="${esc(e.locationName||'')}" placeholder="e.g. Aqlyon Brand Management, Koyilandy"></div><div class="field"><label for="ef-map">Google Maps link</label><input id="ef-map" maxlength="600" value="${esc(e.mapUrl||'')}" placeholder="https://maps.app.goo.gl/…"><small class="small">In Google Maps: find the place → Share → Copy link.</small></div></div>
   <div class="m-on"><div class="field"><label for="ef-on">Online meeting link</label><input id="ef-on" maxlength="600" value="${esc(e.onlineUrl||'')}" placeholder="https://meet.google.com/… or https://zoom.us/j/…"><small class="small">Kept private: free events show it after registering; paid events get it only after you approve them.</small></div></div></fieldset>
  <fieldset class="qset"><legend>Price</legend><div class="rrow">${r('paid','free',e.paid?'paid':'free','Free')}${r('paid','paid',e.paid?'paid':'free','Paid')}</div>
   <div class="m-paid"><div class="f3"><div class="field"><label for="ef-price">Price per person *</label><input id="ef-price" type="number" min="0" step="0.01" value="${e.price||''}"></div><div class="field"><label for="ef-cur">Currency</label><select id="ef-cur">${EV_CUR.map(c=>`<option ${e.currency===c?'selected':''}>${c}</option>`).join('')}</select></div></div><p class="small">Visitors register, then send their details to you on WhatsApp (${esc(EVSET.whatsapp)}) for payment. You approve them under <b>Registrations</b>.</p></div></fieldset>
@@ -125,9 +125,9 @@ function eventForm(e){
 }
 
 
-const CAL_SCRIPT=`// Aqlyon Digital Marketing event invitations
+const CAL_SCRIPT=`// Aqlyon Brand Management event invitations
 // Sends the invitation emails prepared by the website from this Gmail account, with the event attached
-// as a calendar invitation. Subject: "Invitation from Aqlyon Digital Marketing: <event name>".
+// as a calendar invitation. Subject: "Invitation from Aqlyon Brand Management: <event name>".
 var SECRET = '__SECRET__';
 var VERSION = 2;
 
@@ -165,7 +165,7 @@ function send(messages) {
         subject: m.subject,
         body: m.text,
         htmlBody: m.html,
-        name: 'Aqlyon Digital Marketing',
+        name: 'Aqlyon Brand Management',
         attachments: [Utilities.newBlob(m.ics, 'text/calendar; charset=UTF-8; method=' + m.method, 'invite.ics')]
       });
       results.push({ ok: true });
@@ -183,7 +183,7 @@ async function calSetup(){
  const code=CAL_SCRIPT.replace('__SECRET__',st.calSecret);
  const upd=st.calNeedsUpdate;
  modal(`<h2>Calendar invitations</h2>
- <p>Everyone who registers gets an email from <b>${esc(st.calEmail||'your Google account')}</b> with the subject <b>“Invitation from Aqlyon Digital Marketing: <i>event name</i>”</b>. It shows their details and reference number and includes the event as a calendar invitation, so Gmail, Outlook and iPhone show <b>Add to calendar</b>. The calendar entry has reminders 1 day and 1 hour before.</p>
+ <p>Everyone who registers gets an email from <b>${esc(st.calEmail||'your Google account')}</b> with the subject <b>“Invitation from Aqlyon Brand Management: <i>event name</i>”</b>. It shows their details and reference number and includes the event as a calendar invitation, so Gmail, Outlook and iPhone show <b>Add to calendar</b>. The calendar entry has reminders 1 day and 1 hour before.</p>
  ${upd?`<p class="calwarn">⚠ <b>Update needed.</b> Invitations are now sent as our own email instead of Google Calendar's “Invitation from an unknown sender”. Follow steps 2, 3, 4 and 6 below once with the same Apps Script project. The web app URL stays the same.</p>`:st.calUrl?`<p class="calok">✅ Connected${st.calEmail?` to <b>${esc(st.calEmail)}</b>`:''}.</p>`:''}
  <ol class="steps2">
   <li>Sign in to the Google (Gmail) account that should send the invitations. Open your Apps Script project <b>Aqlyon events calendar</b> (or create one at <a href="https://script.google.com/home/projects/create" target="_blank" rel="noopener">script.google.com → New project</a>).</li>

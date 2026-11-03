@@ -95,7 +95,7 @@ function publicEvent(e, list) {
 }
 
 // Calendar invitations: our own email from the academy Gmail account (Apps Script mailer), with the
-// event attached as a calendar invitation. Subject: "Invitation from Aqlyon Digital Marketing: <event name>".
+// event attached as a calendar invitation. Subject: "Invitation from Aqlyon Brand Management: <event name>".
 const adminSettings = (s) => ({ whatsapp: s.whatsapp || '+971509693948', waMsg: s.waMsg || '', waMsgOnline: s.waMsgOnline || '', calUrl: s.calUrl || '', calEmail: s.calEmail || '', calSecret: s.calSecret || '', calNeedsUpdate: !!s.calUrl && !s.calV2 });
 const calOk = (r) => r && (r.status === 'confirmed' || r.status === 'approved');
 async function calPost(cfg, payload, wait = 9000) {
@@ -519,7 +519,7 @@ export function createEvents({ getStore, json }) {
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="/site/site.css"><link rel="stylesheet" href="/site/badge.css"></head>`;
     if (tk === 'preview') return new Response(`${head('Badge preview')}<body class="bdgpage pv"><main class="bdgwrap" id="badge"></main><script src="/js/vendor/qrcode.js"></script><script src="/site/badge.js"></script></body></html>`, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8', 'x-robots-tag': 'noindex' } });
-    if (!f) return new Response(`${head('Badge not found')}<body class="bdgpage"><main class="bdgwrap"><div class="bdgmsg"><h1>Badge not found</h1><p>Check the link, or contact Aqlyon Digital Marketing.</p><p><a class="btn" href="/#events">See upcoming events</a></p></div></main></body></html>`, { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } });
+    if (!f) return new Response(`${head('Badge not found')}<body class="bdgpage"><main class="bdgwrap"><div class="bdgmsg"><h1>Badge not found</h1><p>Check the link, or contact Aqlyon Brand Management.</p><p><a class="btn" href="/#events">See upcoming events</a></p></div></main></body></html>`, { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } });
     const { e, r } = f;
     const pe = publicEvent(e, f.doc.list);
     const data = { design: badgeDesign(e), tk: r.tk, qr: `${origin}/manage#checkin/${r.tk}`, name: nameCase(r.name), role: r.role || '', seats: r.seats || 1, ref: r.ref, status: r.status, valid: calOk(r), attended: r.attended || '',
@@ -540,15 +540,15 @@ export function createEvents({ getStore, json }) {
     const ld = { '@context': 'https://schema.org', '@type': 'Event', name: e.title, description: desc, image: [img], startDate: new Date(pe.startUTC).toISOString(), ...(pe.endUTC ? { endDate: new Date(pe.endUTC).toISOString() } : {}),
       eventAttendanceMode: e.mode === 'online' ? 'https://schema.org/OnlineEventAttendanceMode' : 'https://schema.org/OfflineEventAttendanceMode', eventStatus: 'https://schema.org/EventScheduled',
       location: e.mode === 'online' ? { '@type': 'VirtualLocation', url } : { '@type': 'Place', name: e.locationName, address: e.locationName },
-      organizer: { '@type': 'Organization', name: 'Aqlyon Digital Marketing', url: origin },
+      organizer: { '@type': 'Organization', name: 'Aqlyon Brand Management', url: origin },
       offers: { '@type': 'Offer', price: e.paid ? e.price : 0, priceCurrency: e.currency || 'AED', url, availability: pe.state === 'open' ? 'https://schema.org/InStock' : 'https://schema.org/SoldOut' } };
     const html = `<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>${esc(e.title)} · Aqlyon Digital Marketing</title>
+<title>${esc(e.title)} · Aqlyon Brand Management</title>
 <meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${esc(url)}">
-<meta property="og:type" content="website"><meta property="og:site_name" content="Aqlyon Digital Marketing">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Aqlyon Brand Management">
 <meta property="og:title" content="${esc(e.title)}"><meta property="og:description" content="${esc(desc)}">
 <meta property="og:image" content="${esc(img)}"><meta property="og:url" content="${esc(url)}">
 <meta name="twitter:card" content="summary_large_image">
@@ -558,7 +558,7 @@ export function createEvents({ getStore, json }) {
 <link rel="stylesheet" href="/site/site.css"><link rel="stylesheet" href="/site/events.css">
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>
 </head><body class="evpage">
-<header class="evtop"><a class="brand dmbrand" href="/" aria-label="Aqlyon Digital Marketing, home"><img src="/assets/img/aqlyon-logo.png" alt="Aqlyon Digital Marketing" width="900" height="320"></a><a class="evback" href="/events/">All events</a></header>
+<header class="evtop"><a class="brand dmbrand" href="/" aria-label="Aqlyon Brand Management, home"><img src="/img/aqlyon-q.png" alt="" width="34" height="36"><span><b>Aqlyon</b><small>Brand Management</small></span></a><a class="evback" href="/events/">All events</a></header>
 <main id="ev" data-slug="${esc(e.slug)}"><noscript><h1>${esc(e.title)}</h1><p>${esc(desc)}</p></noscript></main>
 <script>window.EVENT=${JSON.stringify(pe).replace(/</g, '\\u003c')};</script>
 <script src="/js/countries.js"></script><script src="/js/form-fields.js"></script><script src="/site/events.js"></script>

@@ -17,7 +17,7 @@ Every save in `/admin` commits to the **`main`** branch on GitHub. Netlify then 
 
 ## Events with registration (/manage)
 
-Upcoming events, registrations, badges and check-in use the same event module as the Aqlyon Career Discovery Centre site. Manage them at **`/manage`**, which has its own password and is separate from `/admin`.
+Upcoming events, registrations, badges and check-in use the same event module as the Aqlyon Career Discovery Centre site, branded as **Aqlyon Brand Management** (event pages, badges, invitation emails and WhatsApp messages). Manage them at **`/manage`**, which has its own password and is separate from `/admin`.
 
 - **Create events:** name, summary, details, cover photo, date and time zone, in person (location and map link) or online (private joining link), free or paid, and a seat limit.
 - **Registration form builder:** name, email and mobile are always asked. WhatsApp and country are on by default; education level and student/parent can be switched on. You can add any question type (choices, dropdowns, grids, ratings, file upload and more) or a ready-made question such as company name or job title.

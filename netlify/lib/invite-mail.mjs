@@ -1,6 +1,6 @@
 import { nameCase } from './name-case.mjs';
 // Event invitation emails sent from the academy Gmail account (through the Apps Script mailer).
-// Each email has our own subject ("Invitation from Aqlyon Digital Marketing: <event name>"), a branded body with the
+// Each email has our own subject ("Invitation from Aqlyon Brand Management: <event name>"), a branded body with the
 // person's reference, and a calendar invitation (invite.ics, METHOD:REQUEST) so Gmail, Outlook and Apple Mail
 // show "Add to calendar". Updates and cancellations reuse the same UID with a higher SEQUENCE.
 import { TZS, toUTC } from './events.mjs';
@@ -37,14 +37,14 @@ export function inviteMail(e, r, kind, { origin = '', organizer = '', seq = 0 } 
   const join = online && e.onlineUrl ? e.onlineUrl : '';
   const first = String(r.name || '').trim().split(/\s+/)[0] || 'there';
   const cancel = kind === 'cancel';
-  const subject = cancel ? `Cancelled: ${e.title} (Aqlyon Digital Marketing)` : kind === 'update' ? `Updated invitation from Aqlyon Digital Marketing: ${e.title}` : `Invitation from Aqlyon Digital Marketing: ${e.title}`;
+  const subject = cancel ? `Cancelled: ${e.title} (Aqlyon Brand Management)` : kind === 'update' ? `Updated invitation from Aqlyon Brand Management: ${e.title}` : `Invitation from Aqlyon Brand Management: ${e.title}`;
 
-  const descLines = [e.summary || '', join ? `Join online: ${join}` : '', !online && e.mapUrl ? `Map: ${e.mapUrl}` : '', `Your reference: ${r.ref}`, badge && !cancel ? `Your badge: ${badge}` : '', page ? `Event page: ${page}` : '', 'Aqlyon Digital Marketing'].filter(Boolean);
+  const descLines = [e.summary || '', join ? `Join online: ${join}` : '', !online && e.mapUrl ? `Map: ${e.mapUrl}` : '', `Your reference: ${r.ref}`, badge && !cancel ? `Your badge: ${badge}` : '', page ? `Event page: ${page}` : '', 'Aqlyon Brand Management'].filter(Boolean);
   const org = organizer || 'mediadesk@aqlyondm.com';
-  const ics = ['BEGIN:VCALENDAR', 'PRODID:-//Aqlyon Digital Marketing//Events//EN', 'VERSION:2.0', 'CALSCALE:GREGORIAN', `METHOD:${cancel ? 'CANCEL' : 'REQUEST'}`,
+  const ics = ['BEGIN:VCALENDAR', 'PRODID:-//Aqlyon Brand Management//Events//EN', 'VERSION:2.0', 'CALSCALE:GREGORIAN', `METHOD:${cancel ? 'CANCEL' : 'REQUEST'}`,
     'BEGIN:VEVENT', `UID:${e.id}-${r.id}@aqlyondm.com`, `SEQUENCE:${seq}`, `DTSTAMP:${icsDate(Date.now())}`, `DTSTART:${icsDate(start)}`, `DTEND:${icsDate(end)}`,
     `SUMMARY:${icsText(e.title)}`, `DESCRIPTION:${icsText(descLines.join('\n'))}`, `LOCATION:${icsText(join || [where, !online ? e.mapUrl : ''].filter(Boolean).join(' · '))}`,
-    page ? `URL:${page}` : '', `ORGANIZER;CN=Aqlyon Digital Marketing:mailto:${org}`,
+    page ? `URL:${page}` : '', `ORGANIZER;CN=Aqlyon Brand Management:mailto:${org}`,
     `ATTENDEE;CN=${icsText(r.name)};ROLE=REQ-PARTICIPANT;PARTSTAT=${cancel ? 'DECLINED' : 'ACCEPTED'};RSVP=FALSE:mailto:${r.email}`,
     `STATUS:${cancel ? 'CANCELLED' : 'CONFIRMED'}`, 'TRANSP:OPAQUE',
     ...(cancel ? [] : ['BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${icsText(e.title)} is tomorrow`, 'TRIGGER:-P1D', 'END:VALARM',
@@ -60,7 +60,7 @@ export function inviteMail(e, r, kind, { origin = '', organizer = '', seq = 0 } 
   const html = `<!doctype html><html><body style="margin:0;background:#F3F4FA;font-family:Arial,Helvetica,sans-serif">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F3F4FA;padding:24px 12px"><tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:16px;overflow:hidden">
-<tr><td style="background:#1A1E3A;color:#ffffff;padding:18px 24px;font-size:18px;font-weight:bold">Aqlyon Digital Marketing</td></tr>
+<tr><td style="background:#1A1E3A;color:#ffffff;padding:18px 24px;font-size:18px;font-weight:bold">Aqlyon Brand Management</td></tr>
 <tr><td style="padding:24px">
 <p style="margin:0 0 6px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:${cancel ? '#A1262A' : '#5B3FD6'};font-weight:bold">${cancel ? 'Registration cancelled' : kind === 'update' ? 'Event updated' : 'Event invitation'}</p>
 <h1 style="margin:0 0 14px;font-size:22px;line-height:1.3;color:#1A1E3A">${esc(e.title)}</h1>
@@ -69,10 +69,10 @@ ${cancel ? '' : `<table role="presentation" cellpadding="0" cellspacing="0" styl
 ${badge && !cancel && !online ? `<div style="background:#E3F3EA;border-radius:12px;padding:14px 16px;margin:0 0 16px;font-size:14px;line-height:1.5;color:#0D2B22"><b>Your entry badge</b><br>Show the QR code on your badge at the entrance. Save it on your phone or print it.<br><a href="${esc(badge)}" style="display:inline-block;margin-top:10px;background:#0D2B22;color:#ffffff;text-decoration:none;padding:11px 18px;border-radius:999px;font-weight:bold">Open my badge</a></div>` : badge && !cancel ? `<p style="margin:0 0 14px;font-size:14px"><a href="${esc(badge)}" style="color:#5B3FD6">Open my badge</a> (your personal QR code)</p>` : ''}
 ${page && !cancel ? `<p style="margin:0 0 8px"><a href="${esc(page)}" style="display:inline-block;background:#5B3FD6;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:999px;font-weight:bold;font-size:15px">View event page</a></p>` : ''}
 </td></tr>
-<tr><td style="padding:16px 24px;border-top:1px solid #E6E8F2;color:#5B6178;font-size:12px;line-height:1.5">Aqlyon Digital Marketing · You received this because you registered for this event on our website. Reply to this email if you have any questions.</td></tr>
+<tr><td style="padding:16px 24px;border-top:1px solid #E6E8F2;color:#5B6178;font-size:12px;line-height:1.5">Aqlyon Brand Management · You received this because you registered for this event on our website. Reply to this email if you have any questions.</td></tr>
 </table></td></tr></table></body></html>`;
   const text = [`Hi ${first},`, '', cancel ? `Your registration for "${e.title}" has been cancelled.` : kind === 'update' ? `The details for "${e.title}" have changed.` : `You're registered for "${e.title}".`,
     ...(cancel ? [] : ['', `When: ${whenText(e)}`, `Where: ${online ? 'Online' + (join ? ' – ' + join : '') : where + (e.mapUrl ? ' – ' + e.mapUrl : '')}`, `Reference: ${r.ref}`, badge ? `Your badge (show the QR code at the entrance): ${badge}` : '', page ? `Event page: ${page}` : '']),
-    '', 'Aqlyon Digital Marketing'].join('\n');
+    '', 'Aqlyon Brand Management'].join('\n');
   return { to: r.email, subject, html, text, ics, method: cancel ? 'CANCEL' : 'REQUEST' };
 }

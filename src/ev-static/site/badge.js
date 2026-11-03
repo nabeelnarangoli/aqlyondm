@@ -28,7 +28,7 @@ function render(){
  const sz=SIZES[D.size]||SIZES.a6,ar=sz.mm[0]/sz.mm[1];
  const hasOrg=!!(D.org||D.logo);
  const orgHTML=hasOrg?`<div class="borg">${D.logo?`<img class="blogo" src="${esc(D.logo)}" alt="">`:''}${D.org?`<span class="borgn">${esc(D.org)}</span>`:''}</div>`
-  :D.brand?`<div class="borg"><img class="blogo aq" src="/img/aqlyon-q.png" alt=""><span class="borgn"><b>Aqlyon</b> Digital Marketing</span></div>`:'';
+  :D.brand?`<div class="borg"><img class="blogo aq" src="/img/aqlyon-q.png" alt=""><span class="borgn"><b>Aqlyon</b> Brand Management</span></div>`:'';
  const role=D.showRole&&B.role?B.role:'';
  const chips=`${role&&D.tpl!=='conference'?`<span class="bchip ${role==='Parent'?'par':''}">${esc(role)}</span>`:''}${B.seats>1?`<span class="bchip adm">Admits ${B.seats}</span>`:''}`;
  const active=state==='ok'||state==='in';
@@ -45,11 +45,11 @@ function render(){
   ${hasOrg&&D.brand?`<div class="bfoot"><img class="blogo aq" src="/img/aqlyon-q.png" alt=""><span>www.aqlyondm.com</span></div>`:''}
  </article>`;
  document.title=B.preview?'Badge preview':`${B.name} · ${E.title} · Badge`;
- $('#badge').innerHTML=`${B.preview?'':`<p class="bdgtop"><a href="/events/${esc(E.slug)}"><img src="/img/aqlyon-q.png" alt="" width="28" height="28"><span><b>Aqlyon</b> Digital Marketing</span></a></p>`}
+ $('#badge').innerHTML=`${B.preview?'':`<p class="bdgtop"><a href="/events/${esc(E.slug)}"><img src="/img/aqlyon-q.png" alt="" width="28" height="28"><span><b>Aqlyon</b> Brand Management</span></a></p>`}
  <div class="bstage ${D.size==='tag'?'land':''}"><div class="bdgbox sz-${esc(D.size)}">${card}</div></div>
  ${state==='in'?`<p class="stamp">✓ Checked in · ${esc(at)}</p>`:''}
  ${state==='pending'?`<p class="bdgwarn">Your badge is not active yet. It will work once your registration is approved. Open this page again after you get the confirmation.</p>`:''}
- ${state==='off'?`<p class="bdgwarn bad">This registration is ${esc(B.status)}, so the badge can't be used. Contact Aqlyon Digital Marketing if this is a mistake.</p>`:''}
+ ${state==='off'?`<p class="bdgwarn bad">This registration is ${esc(B.status)}, so the badge can't be used. Contact Aqlyon Brand Management if this is a mistake.</p>`:''}
  ${active&&!B.preview?`<p class="bdghint">Show this QR code at the entrance</p><div class="bdgbtns"><button type="button" class="btn" id="save">Save badge image</button><button type="button" class="btn line" id="print">Print (${esc(sz.name)})</button></div>
  <p class="bdgnote">Tip: save the image to your phone so you can show it without internet. Hi ${esc(first)}, see you there!</p>`:''}
  ${B.preview?`<p class="bdgnote">Preview with sample details · printed size ${esc(sz.name)} (${sz.mm[0]} × ${sz.mm[1]} mm)</p>`:`<p class="bdgnote"><a href="/events/${esc(E.slug)}">Event details</a>${E.mapUrl&&E.mode!=='online'?` · <a href="${esc(E.mapUrl)}" target="_blank" rel="noopener">Directions</a>`:''}</p>`}`;

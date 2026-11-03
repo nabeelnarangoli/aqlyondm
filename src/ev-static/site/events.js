@@ -1,4 +1,4 @@
-/* Aqlyon Digital Marketing — Upcoming events
+/* Aqlyon Brand Management — Upcoming events
    1. On the home page: fills the "Upcoming events" section.
    2. On /events/<slug>: the event page with registration, calendar and sharing. */
 (()=>{
