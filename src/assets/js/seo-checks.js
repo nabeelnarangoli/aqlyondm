@@ -75,7 +75,7 @@
       add("kw-density", "Focus keyword", dStatus, "The keyword appears " + n + " time" + (n === 1 ? "" : "s") + " (" + dens.toFixed(1) + "% of the words).",
         dStatus === "good" ? "" : dens > 3 ? "That's too often and can look like keyword stuffing. Replace some with natural variations." : "Use the keyword a few more times where it reads naturally (aim for about 1–2% of the words).");
       var altHas = doc.images.some(function (i) { return has(i.alt, kw); }) || has(input.coverAlt, kw);
-      if (doc.images.length || input.cover) add("kw-alt", "Focus keyword", altHas ? "good" : "ok", altHas ? "An image description (alt text) includes the keyword." : "No image description (alt text) includes the keyword.", altHas ? "" : "Describe at least one image using the keyword, e.g. “Aqlyon team planning a branding project in Kerala”.");
+      if (isPost && (doc.images.length || input.cover)) add("kw-alt", "Focus keyword", altHas ? "good" : "ok", altHas ? "An image description (alt text) includes the keyword." : "No image description (alt text) includes the keyword.", altHas ? "" : "Describe at least one image using the keyword, e.g. “Aqlyon team planning a branding project in Kerala”.");
     }
 
     // ---- title & description ----
@@ -105,8 +105,8 @@
     if (isPost) add("links-ext", "Content", external ? "good" : "ok", external ? external + " link" + (external > 1 ? "s" : "") + " to other websites." : "No links to other websites.", external ? "" : "Linking to a trustworthy source (a study, Google's guidance, an official site) adds credibility.");
     var imgs = doc.images.length + (input.cover ? 1 : 0);
     var noAlt = doc.images.filter(function (i) { return !String(i.alt || "").trim(); }).length + (input.cover && !String(input.coverAlt || "").trim() ? 1 : 0);
-    add("images", "Content", imgs ? "good" : "ok", imgs ? imgs + " image" + (imgs > 1 ? "s" : "") + "." : "No images.", imgs ? "" : "Add at least one relevant image; posts with images get more clicks and shares.");
-    if (imgs) add("alt", "Content", noAlt ? "bad" : "good", noAlt ? noAlt + " image" + (noAlt > 1 ? "s have" : " has") + " no description (alt text)." : "Every image has a description (alt text).", noAlt ? "Describe each image in a few words. It helps Google Images and people using screen readers." : "");
+    if (isPost) add("images", "Content", imgs ? "good" : "ok", imgs ? imgs + " image" + (imgs > 1 ? "s" : "") + "." : "No images.", imgs ? "" : "Add at least one relevant image; posts with images get more clicks and shares.");
+    if (isPost && imgs) add("alt", "Content", noAlt ? "bad" : "good", noAlt ? noAlt + " image" + (noAlt > 1 ? "s have" : " has") + " no description (alt text)." : "Every image has a description (alt text).", noAlt ? "Describe each image in a few words. It helps Google Images and people using screen readers." : "");
     if (isPost && "cover" in input) add("cover", "Content", input.cover ? "good" : "ok", input.cover ? "There's a cover image (used when the post is shared)." : "There's no cover image.", input.cover ? "" : "Add a wide cover image (at least 1200 px). It shows in WhatsApp, Facebook and LinkedIn previews.");
 
     // ---- readability ----

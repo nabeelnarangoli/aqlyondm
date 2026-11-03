@@ -182,6 +182,22 @@ eventsModule: true
 </section>
 {% endif %}
 
+<!-- ============ ABOUT (search-friendly summary) ============ -->
+{% if home.about %}{% set ab = home.about %}
+<section class="section about" id="about" aria-labelledby="about-h">
+  <div class="wrap about-in">
+    <div class="about-head reveal">
+      <h2 id="about-h">{{ ab.heading }}</h2>
+      {% if ab.points %}<ul class="about-points">{% for pt in ab.points %}<li>{{ pt }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+    <div class="about-body reveal">
+      {% for para in ab.paragraphs %}<p>{{ para }}</p>{% endfor %}
+      {% if ab.cta %}<a class="btn btn-dark" href="#contact">{{ ab.cta }}</a>{% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
 <!-- ============ BLOG ============ -->
 {% if collections.posts.length %}
 <section class="section" id="insights">

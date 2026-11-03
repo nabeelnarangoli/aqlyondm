@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-{% if seo_title %}{% set pageTitle = seo_title %}{% elif page.url == "/" %}{% set pageTitle = site.title + " | " + (site.seo_home_title or site.description) %}{% elif title %}{% set pageTitle = title + " | " + site.title %}{% else %}{% set pageTitle = site.title %}{% endif %}
-{% set pageDesc = meta_description or description or excerpt or site.description %}
+{% if seo_title %}{% set pageTitle = seo_title %}{% elif page.url == "/" %}{% set pageTitle = site.seo_home_title or (site.title + " | " + site.description) %}{% elif title %}{% set pageTitle = title + " | " + site.title %}{% else %}{% set pageTitle = site.title %}{% endif %}
+{% set pageDesc = meta_description or description or excerpt or (site.seo_home_description if page.url == "/" else "") or site.description %}
 {% set pageUrl = page.url | absoluteUrl(site.url) %}
 {% set pageImage = (cover or '/img/og-default.png') | absoluteUrl(site.url) %}
 <title>{{ pageTitle }}</title>

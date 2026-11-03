@@ -175,6 +175,14 @@ collections:
                   - { label: Short description, name: summary, widget: string, required: false }
                   - { label: Popup text, name: details, widget: text, required: false, hint: "Shown when someone clicks the tile." }
                   - { label: "What's included", name: includes, widget: list, required: false, field: { label: Item, name: item, widget: string } }
+          - label: "About section (helps Google ranking)"
+            name: about
+            widget: object
+            fields:
+              - { label: Heading, name: heading, widget: string, hint: "Include the home page focus keyword." }
+              - { label: Paragraphs, name: paragraphs, widget: list, field: { label: Paragraph, name: text, widget: text } }
+              - { label: Service points, name: points, widget: list, field: { label: Point, name: point, widget: string } }
+              - { label: Button text, name: cta, widget: string }
           - { label: Client logos heading, name: clients_heading, widget: string }
           - { label: Testimonials heading, name: testimonials_heading, widget: string }
           - { label: Events heading, name: events_heading, widget: string }
@@ -192,7 +200,8 @@ collections:
         file: src/_data/site.json
         fields:
           - { label: Site name, name: title, widget: string }
-          - { label: "Home page title for Google", name: seo_home_title, widget: string, hint: "Shown after the site name on the home page tab and in Google, e.g. 'Branding & Digital Marketing Agency in Dubai and Kerala'." }
+          - { label: "Home page title for Google", name: seo_home_title, widget: string, hint: "The full title Google shows for the home page. Keep it under 60 characters and start with the focus keyword, e.g. 'Digital Marketing Company in Dubai & Koyilandy | Aqlyon'." }
+          - { label: "Home page description for Google", name: seo_home_description, widget: text, required: false, hint: "120–160 characters, including the focus keyword once. Shown under the title in Google results." }
           - { label: "Home page focus keyword", name: seo_home_keyword, widget: string, required: false, hint: "The main search phrase the home page should rank for. The SEO report at /seo scores the home page for it." }
           - { label: "Google Search Console verification code", name: google_verification, widget: string, required: false, hint: "Only the content=\"…\" value from Search Console's HTML tag method." }
           - { label: Google description, name: description, widget: text }

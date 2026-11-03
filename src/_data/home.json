@@ -1,11 +1,11 @@
 {
   "hero": {
-    "kicker": "Digital marketing & creative studio · Dubai · Kerala",
+    "kicker": "Digital marketing company in Dubai & Koyilandy",
     "line1": "From day one",
     "line2_prefix": "to",
     "line2_highlight": "daily",
     "line3": "sales.",
-    "intro": "Starting a company? We build your brand, create every asset, run your marketing and bring in the leads — one partner for the whole journey.",
+    "intro": "Starting a company? We build your brand, create every asset, run your marketing and bring in the leads — one partner for the whole journey, from Dubai to Koyilandy.",
     "primary_cta": "Take the journey ↓",
     "secondary_cta": "Start a project →"
   },
@@ -144,6 +144,22 @@
       }
     ],
     "popup_contact_heading": "Talk to us about this"
+  },
+  "about": {
+    "heading": "Brand management & digital marketing company in Dubai & Koyilandy",
+    "paragraphs": [
+      "Aqlyon is a digital marketing company in Dubai and Koyilandy that takes businesses from their first idea to daily sales. Our two offices, Aqlyon Digital Marketing in Dubai, UAE and Aqlyon Brand Management in Koyilandy, Kerala, work as one team. Clients in the GCC and in India get the same strategy, design quality and reporting.",
+      "As a brand management company, we shape your name, logo and brand voice, then keep them consistent on every signboard, post and package. As a social media management company, we plan, design and publish your posts and reels, reply to your audience and share clear monthly reports.",
+      "As a graphic and poster design company, we create posters, event branding, LED screen visuals, brochures and print that people remember. Our digital marketing team then runs Google and Meta campaigns that turn that attention into enquiries.",
+      "Looking for a digital marketing company in Dubai or Koyilandy that handles everything in one place? Tell us about your business and we'll suggest where to start."
+    ],
+    "points": [
+      "Brand management",
+      "Digital marketing & lead generation",
+      "Social media management",
+      "Graphic & poster design"
+    ],
+    "cta": "Talk to us about your business →"
   },
   "clients_heading": "Brands we've worked with",
   "testimonials_heading": "What our clients say",

@@ -334,3 +334,20 @@ body.svc-open{overflow:hidden}
 .svc-actions{margin-top:14px;display:flex;flex-wrap:wrap;gap:10px}
 .svc-actions .btn{min-height:44px;padding:11px 20px;font-size:15px}
 @media (max-width:560px){.svc-head{padding:28px 22px 24px}.svc-body{padding:22px 22px 26px}.svc-contact{padding:18px}.svc-dialog{border-radius:24px}}
+
+/* About: search-friendly summary of the services */
+.about-in{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:40px 64px;align-items:start}
+.about-head h2{font-weight:700;font-size:clamp(32px,4.2vw,56px);line-height:1;letter-spacing:-.04em;margin:0}
+.about-points{list-style:none;padding:0;margin:28px 0 0;display:flex;flex-wrap:wrap;gap:8px}
+.about-points li{padding:8px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:600;font-size:15px}
+.about-points li:nth-child(1){background:var(--sun);border-color:transparent}
+.about-points li:nth-child(2){background:#22AD72;border-color:transparent}
+.about-points li:nth-child(3){background:var(--lilac);border-color:transparent}
+.about-points li:nth-child(4){background:var(--sky);border-color:transparent}
+.about-body p{margin:0 0 18px;font-size:18px;line-height:1.6;color:var(--ink-2)}
+.about-body .btn{margin-top:8px}
+@media (max-width:860px){.about-in{grid-template-columns:1fr;gap:24px}.about-body p{font-size:16.5px}}
+.evs-list{margin:0 0 18px;padding:0;list-style:none;display:grid;gap:10px}
+.evs-list li{font-size:17px;line-height:1.55;color:var(--ink-2);padding-left:22px;position:relative}
+.evs-list li::before{content:"";position:absolute;left:0;top:.6em;width:10px;height:10px;border-radius:3px;background:#22AD72}
+.evs-list b{color:var(--ink)}
