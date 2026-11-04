@@ -38,6 +38,28 @@ export function cleanBadge(b = {}) {
 }
 const badgeDesign = (e) => { const d = cleanBadge(e.badge || {}); return { ...d, logo: d.logo ? `/api/img/${d.logo}` : '' }; };
 
+// Live stream, videos and photos for an event
+const LOCAL_DT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+export const ytId = (u) => { const m = /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|live\/|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/i.exec(String(u || '')); return m ? m[1] : ''; };
+function cleanMedia(b, e) {
+  if (b.live !== undefined) {
+    const l = b.live || {};
+    e.live = { url: String(l.url || '').trim().slice(0, 600), start: LOCAL_DT.test(l.start || '') ? l.start : '', end: LOCAL_DT.test(l.end || '') ? l.end : '',
+      status: ['auto', 'live', 'ended'].includes(l.status) ? l.status : 'auto' };
+  }
+  if (b.videos !== undefined) e.videos = (Array.isArray(b.videos) ? b.videos : []).map((v) => ({ url: String((v && v.url) || '').trim().slice(0, 600), title: String((v && v.title) || '').trim().slice(0, 120) })).filter((v) => v.url).slice(0, 30);
+  if (b.photos !== undefined) e.photos = [...new Set((Array.isArray(b.photos) ? b.photos : []).filter((id) => /^[a-f0-9]{24}$/.test(id)))].slice(0, 80);
+}
+// when the live stream starts and ends (UTC ms); the status is worked out from these unless set by hand
+function liveInfo(e) {
+  const l = e.live; if (!l || !l.url) return null;
+  const startUTC = toUTC(l.start || e.start, e.tz);
+  const evEnd = e.end ? toUTC(e.end, e.tz) : NaN;
+  const endUTC = l.end ? toUTC(l.end, e.tz) : (evEnd > startUTC ? evEnd : startUTC + 3 * 3600_000);
+  return { url: l.url, yt: ytId(l.url), start: l.start || e.start, startUTC, endUTC, status: l.status || 'auto' };
+}
+export const liveStatus = (li, now = Date.now()) => !li ? '' : li.status === 'live' ? 'live' : li.status === 'ended' ? 'ended' : now < li.startUTC ? 'scheduled' : now < li.endUTC ? 'live' : 'ended';
+
 const waText = (v) => String(v ?? '').replace(/\r/g, '').slice(0, 1500).trim();
 function clean(b, old = {}) {
   const e = { ...old };
@@ -58,6 +80,7 @@ function clean(b, old = {}) {
   if (b.waMsg !== undefined) e.waMsg = waText(b.waMsg); // WhatsApp confirmation message for this event ('' = use the common one)
   if (b.badge !== undefined) e.badge = cleanBadge(b.badge);
   if (b.maxSeats !== undefined) e.maxSeats = Math.min(20, Math.max(1, parseInt(b.maxSeats, 10) || 1));
+  cleanMedia(b, e);
   return e;
 }
 function validate(e) {
@@ -70,6 +93,10 @@ function validate(e) {
   if (e.mode === 'online' && e.onlineUrl && !isUrl(e.onlineUrl)) return 'The online link must start with https://';
   if (e.regMode === 'link' && !isUrl(e.regLink)) return 'Please add the registration link (starting with https://).';
   if (e.paid && !(e.price > 0)) return 'Paid event: please add the price.';
+  if (e.live && e.live.url && !isUrl(e.live.url)) return 'The live stream link must start with https://';
+  if (e.live && e.live.end && toUTC(e.live.end, e.tz) <= toUTC(e.live.start || e.start, e.tz)) return 'The live stream must end after it starts.';
+  const badVid = (e.videos || []).find((v) => !isUrl(v.url));
+  if (badVid) return `This video link isn't valid: ${badVid.url.slice(0, 60)}. Links must start with https://`;
   return '';
 }
 const ended = (e, now = Date.now()) => (e.end ? toUTC(e.end, e.tz) : toUTC(e.start, e.tz) + 3 * 3600_000) < now;
@@ -91,6 +118,9 @@ function publicEvent(e, list) {
     mode: e.mode, locationName: e.mode === 'offline' ? e.locationName || '' : '', mapUrl: e.mode === 'offline' ? e.mapUrl || '' : '',
     paid: !!e.paid, price: e.price || 0, currency: e.currency || 'AED', regMode: e.regMode, regLink: e.regMode === 'link' ? e.regLink : '',
     form: formOf(e), share: e.share !== false, state: regState(e, list), seatsLeft: e.capacity ? Math.max(0, e.capacity - taken) : null, maxSeats: e.maxSeats || 1,
+    live: (() => { const li = liveInfo(e); return li ? { ...li, now: liveStatus(li) } : null; })(),
+    videos: (e.videos || []).map((v) => ({ yt: ytId(v.url), url: v.url, title: v.title || '' })),
+    photos: (e.photos || []).map((id) => `/api/img/${id}`),
   };
 }
 
@@ -346,7 +376,7 @@ export function createEvents({ getStore, json }) {
     }
     if (path === '/admin/events' && method === 'GET') {
       const out = [];
-      for (const e of await all()) { const list = await getRegs(e.id); out.push({ ...e, state: regState(e, list), counts: { total: list.length, seats: seatsTaken(list), pending: list.filter((r) => r.status === 'pending').length, attended: list.filter((r) => calOk(r) && r.attended).reduce((t, r) => t + (r.seats || 1), 0) } }); }
+      for (const e of await all()) { const list = await getRegs(e.id); out.push({ ...e, state: regState(e, list), liveNow: liveStatus(liveInfo(e)), counts: { total: list.length, seats: seatsTaken(list), pending: list.filter((r) => r.status === 'pending').length, attended: list.filter((r) => calOk(r) && r.attended).reduce((t, r) => t + (r.seats || 1), 0) } }); }
       out.sort((a, b) => toUTC(b.start, b.tz) - toUTC(a.start, a.tz));
       return json(200, { events: out, settings: adminSettings(await rawSettings()) });
     }
@@ -495,6 +525,7 @@ export function createEvents({ getStore, json }) {
       if (!m[2] && method === 'PATCH') {
         const n = clean(body, e); const err = validate(n); if (err) return json(400, { error: err });
         n.updatedAt = new Date().toISOString(); await store.setJSON(e.id, n);
+        for (const id of (e.photos || [])) if (!(n.photos || []).includes(id)) await images().delete(id);   // photos removed from the gallery
         // keep the calendar invitation in step: new name, time or place is sent to every guest
         let cal = '';
         const keys = ['title', 'start', 'end', 'tz', 'mode', 'locationName', 'mapUrl', 'onlineUrl', 'summary'];
@@ -508,7 +539,7 @@ export function createEvents({ getStore, json }) {
       if (!m[2] && method === 'DELETE') {
         for (const r of await getRegs(e.id)) for (const v of Object.values(r.answers || {})) if (v && v.id && v.size !== undefined) await uploads().delete(v.id);
         if (e.staffKey) await meta().delete('staff-' + e.staffKey);
-        await store.delete(e.id); await regs().delete(e.id); if (e.cover) await images().delete(e.cover); if (e.badge && e.badge.logo) await images().delete(e.badge.logo); return json(200, { ok: true }); }
+        await store.delete(e.id); await regs().delete(e.id); if (e.cover) await images().delete(e.cover); if (e.badge && e.badge.logo) await images().delete(e.badge.logo); for (const id of (e.photos || [])) await images().delete(id); return json(200, { ok: true }); }
     }
     return null;
   }

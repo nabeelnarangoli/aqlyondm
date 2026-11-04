@@ -28,10 +28,10 @@ function renderEvents(){
  const main=$('.adm');
  const card=e=>{const [sl,sc]=STATE_LABEL[e.state]||['',''];return `<article class="evcard">
   <div class="evthumb">${e.cover?`<img src="/api/img/${e.cover}" alt="" loading="lazy">`:'<span>No cover</span>'}</div>
-  <div class="evbody"><div class="evchips">${e.published?'':'<span class="chipx draft">Draft (hidden)</span>'}<span class="chipx ${sc}">${sl}</span><span class="chipx">${e.mode==='online'?'Online':'Offline'}</span><span class="chipx">${e.paid?esc(e.currency+' '+e.price):'Free'}</span></div>
+  <div class="evbody"><div class="evchips">${e.published?'':'<span class="chipx draft">Draft (hidden)</span>'}<span class="chipx ${sc}">${sl}</span>${e.liveNow==='live'?'<span class="chipx live">● Live now</span>':e.liveNow==='scheduled'?'<span class="chipx sched">📡 Live scheduled</span>':''}${(e.photos||[]).length||(e.videos||[]).length?`<span class="chipx">${(e.photos||[]).length} photos · ${(e.videos||[]).length} videos</span>`:''}<span class="chipx">${e.mode==='online'?'Online':'Offline'}</span><span class="chipx">${e.paid?esc(e.currency+' '+e.price):'Free'}</span></div>
   <h3>${esc(e.title)}</h3><p class="small">${esc(evDate(e))}${e.mode==='offline'&&e.locationName?' · '+esc(e.locationName):''}</p>
   <p class="small">${e.regMode==='form'?`<b>${e.counts.total}</b> registration${e.counts.total===1?'':'s'} · ${e.counts.seats} seat${e.counts.seats===1?'':'s'}${e.capacity?' of '+e.capacity:''}${e.counts.pending?` · <b class="warn">${e.counts.pending} waiting for approval</b>`:''}`:e.regMode==='link'?'Registration on an external link':'No registration'}</p>
-  <div class="evbtns"><button type="button" class="btn sm" data-ev="edit" data-id="${e.id}">Edit</button>${e.regMode==='form'?`<button type="button" class="btn sm ghost" data-ev="regs" data-id="${e.id}">Registrations</button>`:''}${e.regMode!=='none'&&e.state!=='ended'?`<button type="button" class="btn sm ghost" data-ev="toggle" data-id="${e.id}">${e.regOpen?'Close registration':'Open registration'}</button>`:''}${e.regMode==='form'&&e.mode!=='online'&&e.counts.total?`<button type="button" class="btn sm ghost" data-ev="scan" data-id="${e.id}">📷 Check-in${e.counts.attended?` (${e.counts.attended})`:''}</button>`:''}<button type="button" class="btn sm ghost" data-ev="copy" data-id="${e.id}">Copy link</button><a class="btn sm ghost" href="/events/${esc(e.slug)}" target="_blank" rel="noopener">View page ↗</a></div></div></article>`};
+  <div class="evbtns"><button type="button" class="btn sm" data-ev="edit" data-id="${e.id}">Edit</button><button type="button" class="btn sm ghost" data-ev="media" data-id="${e.id}">📡 Live & media</button>${e.regMode==='form'?`<button type="button" class="btn sm ghost" data-ev="regs" data-id="${e.id}">Registrations</button>`:''}${e.regMode!=='none'&&e.state!=='ended'?`<button type="button" class="btn sm ghost" data-ev="toggle" data-id="${e.id}">${e.regOpen?'Close registration':'Open registration'}</button>`:''}${e.regMode==='form'&&e.mode!=='online'&&e.counts.total?`<button type="button" class="btn sm ghost" data-ev="scan" data-id="${e.id}">📷 Check-in${e.counts.attended?` (${e.counts.attended})`:''}</button>`:''}<button type="button" class="btn sm ghost" data-ev="copy" data-id="${e.id}">Copy link</button><a class="btn sm ghost" href="/events/${esc(e.slug)}" target="_blank" rel="noopener">View page ↗</a></div></div></article>`};
  const t=e=>Date.parse(e.start+':00');const up=EVENTS.filter(e=>e.state!=='ended').sort((a,b)=>t(a)-t(b)),past=EVENTS.filter(e=>e.state==='ended').sort((a,b)=>t(b)-t(a));
  main.innerHTML=`<div class="admhead"><h1>Events</h1><button type="button" class="btn" id="newev">＋ New event</button></div>
  <div class="calbar ${EVSET.calUrl&&!EVSET.calNeedsUpdate?'on':EVSET.calNeedsUpdate?'warn':''}"><span class="calic">📅</span><div><b>Calendar invitations ${EVSET.calNeedsUpdate?'need a quick update':EVSET.calUrl?'on':'off'}</b><small>${EVSET.calNeedsUpdate?'Switch to our own invitation email (“Invitation from Aqlyon Brand Management: event name”). Takes 2 minutes.':EVSET.calUrl?`Emailed from ${esc(EVSET.calEmail||'your Google account')} as “Invitation from Aqlyon Brand Management: <i>event name</i>”, with the event attached for their calendar.`:'Connect so everyone who registers gets an invitation email with the event for their calendar.'}</small></div><button type="button" class="btn sm ${EVSET.calUrl&&!EVSET.calNeedsUpdate?'ghost':''} calsetup">${EVSET.calNeedsUpdate?'Update now':EVSET.calUrl?'Settings':'Connect'}</button></div>
@@ -54,6 +54,7 @@ function renderEvents(){
   try{EVSET=await AAPI.call('/admin/events/settings',{method:'PATCH',body:{whatsapp:$('#es-wa').value,defaultTz:$('#es-tz').value,waMsg:keep(0),waMsgOnline:keep(1)}});toast('Settings saved');renderEvents()}catch(err){$('.formerr',f).textContent=err.message}};
  $$('[data-ev]').forEach(b=>b.onclick=async()=>{const e=EVENTS.find(x=>x.id===b.dataset.id);const a=b.dataset.ev;
   if(a==='edit')return eventForm(e);
+  if(a==='media')return mediaForm(e);
   if(a==='regs')return regsView(e);
   if(a==='scan')return checkinView(e);
   if(a==='copy')return copy(evLink(e));
@@ -125,6 +126,53 @@ function eventForm(e){
  });
 }
 
+
+/* ---------- Live stream, videos and photos for one event ---------- */
+const LIVE_HOST=u=>{const h=(()=>{try{return new URL(u).hostname.replace(/^www\.|^m\./,'')}catch(x){return ''}})();return /youtu/.test(h)?'YouTube':/facebook|fb\.watch/.test(h)?'Facebook':/instagram/.test(h)?'Instagram':/linkedin/.test(h)?'LinkedIn':/zoom/.test(h)?'Zoom':/vimeo/.test(h)?'Vimeo':h||'link'};
+const ytOf=u=>{const m=/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|live\/|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/i.exec(String(u||''));return m?m[1]:''};
+function mediaForm(e){
+ const L=Object.assign({url:'',start:'',end:'',status:'auto'},e.live||{});
+ let videos=(e.videos||[]).map(v=>({...v})),photos=(e.photos||[]).slice();
+ const st=(v,label,sub)=>`<label class="radio"><input type="radio" name="lvst" value="${v}" ${L.status===v?'checked':''}><span>${label}${sub?`<small> ${sub}</small>`:''}</span></label>`;
+ modal(`<h2>Live & media</h2><p class="small" style="margin-top:-6px">${esc(e.title)} · ${esc(evDate(e))}</p><form class="mform mediaform">
+ <fieldset class="qset"><legend>📡 Live stream</legend>
+  <div class="field"><label for="lv-url">Live stream link</label><input id="lv-url" maxlength="600" value="${esc(L.url)}" placeholder="https://youtube.com/live/… or a Facebook / Instagram live link"><small class="small">YouTube streams play right on the event page. Other links (Facebook, Instagram, LinkedIn) show a “Watch live” button. Visitors can see this link.</small></div>
+  <div class="f3"><div class="field"><label for="lv-start">Stream starts <small>(empty = event start)</small></label><input type="datetime-local" id="lv-start" value="${esc(L.start)}"></div><div class="field"><label for="lv-end">Stream ends <small>(optional)</small></label><input type="datetime-local" id="lv-end" value="${esc(L.end)}"></div></div>
+  <p class="small">Times are in the event's time zone. The website shows <b>Live scheduled</b> before the start, <b>Live now</b> between start and end, then the recording.</p>
+  <div class="rrow lvst">${st('auto','Automatic','by the times above')}${st('live','🔴 Live now','show it as live right away')}${st('ended','Ended','show it as finished')}</div>
+ </fieldset>
+ <fieldset class="qset"><legend>🎬 Videos</legend><p class="small">Paste YouTube links (highlights, speeches, recap films). They play on the event page. Up to 30.</p>
+  <div class="vidlist"></div>
+  <div class="vidadd"><input id="vd-url" maxlength="600" placeholder="https://youtu.be/…"><input id="vd-title" maxlength="120" placeholder="Title (optional)"><button type="button" class="btn sm ghost" id="vd-add">Add video</button></div>
+ </fieldset>
+ <fieldset class="qset"><legend>📸 Photos</legend><p class="small">Choose several photos at once. They're resized in your browser before uploading. Up to 80.</p>
+  <label class="btn sm ghost upbtn">＋ Add photos<input type="file" id="ph-in" accept="image/jpeg,image/png,image/webp" multiple hidden></label> <span class="small phstat"></span>
+  <div class="phgrid"></div>
+ </fieldset>
+ <p class="formerr" role="alert"></p>
+ <div class="mrow">${e.slug?`<a class="btn ghost" href="/events/${esc(e.slug)}" target="_blank" rel="noopener" style="margin-right:auto">View event page ↗</a>`:''}<button type="button" class="btn ghost" data-close>Cancel</button><button class="btn" type="submit">Save</button></div></form>`,(m,close)=>{
+  m.querySelector('.modal').classList.add('wide');
+  const drawV=()=>{$('.vidlist',m).innerHTML=videos.length?videos.map((v,i)=>{const y=ytOf(v.url);return `<div class="vidrow">${y?`<img src="https://i.ytimg.com/vi/${y}/mqdefault.jpg" alt="">`:'<span class="novid">🎬</span>'}<div><input data-vt="${i}" value="${esc(v.title)}" placeholder="Title (optional)" maxlength="120"><small class="small">${esc(v.url)}${y?'':' · not a YouTube link: shown as a button'}</small></div><button type="button" class="linkbtn" data-vu="${i}" ${i?'':'disabled'} aria-label="Move up">↑</button><button type="button" class="linkbtn" data-vx="${i}">Remove</button></div>`}).join(''):'<p class="small muted">No videos yet.</p>';
+   $$('[data-vt]',m).forEach(x=>x.oninput=()=>{videos[+x.dataset.vt].title=x.value});
+   $$('[data-vx]',m).forEach(x=>x.onclick=()=>{videos.splice(+x.dataset.vx,1);drawV()});
+   $$('[data-vu]',m).forEach(x=>x.onclick=()=>{const i=+x.dataset.vu;if(i){[videos[i-1],videos[i]]=[videos[i],videos[i-1]];drawV()}})};
+  const addV=()=>{const u=$('#vd-url',m).value.trim();if(!u)return;if(!/^https?:\/\//i.test(u))return toast('Video links must start with https://',true);if(videos.length>=30)return toast('Up to 30 videos.',true);videos.push({url:u,title:$('#vd-title',m).value.trim()});$('#vd-url',m).value='';$('#vd-title',m).value='';drawV()};
+  $('#vd-add',m).onclick=addV;[$('#vd-url',m),$('#vd-title',m)].forEach(x=>x.onkeydown=ev=>{if(ev.key==='Enter'){ev.preventDefault();addV()}});
+  const drawP=()=>{$('.phgrid',m).innerHTML=photos.map((id,i)=>`<figure><img src="/api/img/${id}" alt="" loading="lazy"><button type="button" data-px="${i}" aria-label="Remove photo">×</button>${i?`<button type="button" class="pl" data-pl="${i}" aria-label="Move earlier">‹</button>`:''}</figure>`).join('');
+   $('.phstat',m).textContent=photos.length?photos.length+' photo'+(photos.length===1?'':'s'):'';
+   $$('[data-px]',m).forEach(x=>x.onclick=()=>{photos.splice(+x.dataset.px,1);drawP()});
+   $$('[data-pl]',m).forEach(x=>x.onclick=()=>{const i=+x.dataset.pl;[photos[i-1],photos[i]]=[photos[i],photos[i-1]];drawP()})};
+  $('#ph-in',m).onchange=async ev=>{const files=[...ev.target.files].slice(0,80-photos.length);ev.target.value='';let n=0;
+   for(const f of files){$('.phstat',m).textContent=`Uploading ${++n} of ${files.length}…`;try{const img=await prepImage(f);const d=await AAPI.call('/admin/upload',{method:'POST',body:{type:img.type,data:img.data}});photos.push(d.id);drawP()}catch(err){toast(f.name+': '+err.message,true)}}
+   drawP();toast(files.length+' photo'+(files.length===1?'':'s')+' added. Press Save to publish them.')};
+  drawV();drawP();
+  $('form',m).addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.tagName==='INPUT')ev.preventDefault()});
+  $('form',m).onsubmit=async ev=>{ev.preventDefault();const btn=$('button[type=submit]',m);btn.disabled=true;
+   if($('#vd-url',m).value.trim())addV();
+   const body={live:{url:$('#lv-url',m).value.trim(),start:$('#lv-start',m).value,end:$('#lv-end',m).value,status:(m.querySelector('input[name=lvst]:checked')||{}).value||'auto'},videos,photos};
+   try{await AAPI.call('/admin/events/'+e.id,{method:'PATCH',body});close();toast('Live & media saved');await loadEvents();renderEvents()}catch(err){$('.formerr',m).textContent=err.message;btn.disabled=false}};
+ });
+}
 
 const CAL_SCRIPT=`// Aqlyon Brand Management event invitations
 // Sends the invitation emails prepared by the website from this Gmail account, with the event attached
