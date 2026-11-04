@@ -128,7 +128,10 @@ function eventForm(e){
 
 
 /* ---------- Live stream, videos and photos for one event ---------- */
-const LIVE_HOST=u=>{const h=(()=>{try{return new URL(u).hostname.replace(/^www\.|^m\./,'')}catch(x){return ''}})();return /youtu/.test(h)?'YouTube':/facebook|fb\.watch/.test(h)?'Facebook':/instagram/.test(h)?'Instagram':/linkedin/.test(h)?'LinkedIn':/zoom/.test(h)?'Zoom':/vimeo/.test(h)?'Vimeo':h||'link'};
+const LIVE_HOST=u=>{const h=(()=>{try{return new URL(u).hostname.replace(/^www\.|^m\./,'')}catch(x){return ''}})();return /youtu/.test(h)?'YouTube':/facebook|fb\.watch/.test(h)?'Facebook':/instagram/.test(h)?'Instagram':/linkedin/.test(h)?'LinkedIn':/tiktok/.test(h)?'TikTok':/drive\.google/.test(h)?'Google Drive':/zoom/.test(h)?'Zoom':/vimeo/.test(h)?'Vimeo':h||'link'};
+const PLAYS=u=>{let x;try{x=new URL(u)}catch(e){return false}const h=x.hostname.replace(/^(www|m|mobile|web)\./,''),p=x.pathname;
+ return /(youtube\.com|youtu\.be)$/.test(h)?!!ytOf(u):/(facebook\.com|fb\.watch)$/.test(h)?(/fb\.watch/.test(h)||/\/(videos|reel|watch|share\/[vr])|story\.php|\/live/.test(u)):/instagram\.com$/.test(h)?/\/(p|reel|reels|tv)\//.test(p):/tiktok\.com$/.test(h)?/\/video\/\d+/.test(p):/vimeo\.com$/.test(h)?/\d+/.test(p):/linkedin\.com$/.test(h)?/(activity|ugcPost)[-:]\d{10,}/.test(u):/drive\.google\.com$/.test(h)?/\/d\/|[?&]id=/.test(u):/\.(mp4|webm|mov|m4v)$/i.test(p)};
+const HOST_ICON={YouTube:'▶️',Facebook:'📘',Instagram:'📸',TikTok:'🎵',Vimeo:'🎞️',LinkedIn:'💼'};
 const ytOf=u=>{const m=/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|live\/|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/i.exec(String(u||''));return m?m[1]:''};
 function mediaForm(e){
  const L=Object.assign({url:'',start:'',end:'',status:'auto'},e.live||{});
@@ -136,14 +139,14 @@ function mediaForm(e){
  const st=(v,label,sub)=>`<label class="radio"><input type="radio" name="lvst" value="${v}" ${L.status===v?'checked':''}><span>${label}${sub?`<small> ${sub}</small>`:''}</span></label>`;
  modal(`<h2>Live & media</h2><p class="small" style="margin-top:-6px">${esc(e.title)} · ${esc(evDate(e))}</p><form class="mform mediaform">
  <fieldset class="qset"><legend>📡 Live stream</legend>
-  <div class="field"><label for="lv-url">Live stream link</label><input id="lv-url" maxlength="600" value="${esc(L.url)}" placeholder="https://youtube.com/live/… or a Facebook / Instagram live link"><small class="small">YouTube streams play right on the event page. Other links (Facebook, Instagram, LinkedIn) show a “Watch live” button. Visitors can see this link.</small></div>
+  <div class="field"><label for="lv-url">Live stream link</label><input id="lv-url" maxlength="600" value="${esc(L.url)}" placeholder="https://youtube.com/live/… or a Facebook / Instagram live link"><small class="small">YouTube, Facebook and Vimeo streams play right on the event page. Other links (Instagram Live, Zoom…) show a “Watch live” button. Visitors can see this link.</small></div>
   <div class="f3"><div class="field"><label for="lv-start">Stream starts <small>(empty = event start)</small></label><input type="datetime-local" id="lv-start" value="${esc(L.start)}"></div><div class="field"><label for="lv-end">Stream ends <small>(optional)</small></label><input type="datetime-local" id="lv-end" value="${esc(L.end)}"></div></div>
   <p class="small">Times are in the event's time zone. The website shows <b>Live scheduled</b> before the start, <b>Live now</b> between start and end, then the recording.</p>
   <div class="rrow lvst">${st('auto','Automatic','by the times above')}${st('live','🔴 Live now','show it as live right away')}${st('ended','Ended','show it as finished')}</div>
  </fieldset>
- <fieldset class="qset"><legend>🎬 Videos</legend><p class="small">Paste YouTube links (highlights, speeches, recap films). They play on the event page. Up to 30.</p>
+ <fieldset class="qset"><legend>🎬 Videos</legend><p class="small">Paste links to highlights, speeches, reels or recap films: YouTube, Facebook, Instagram, TikTok, Vimeo, LinkedIn, Google Drive or a video file (.mp4). They play right on the event page. Up to 30.</p>
   <div class="vidlist"></div>
-  <div class="vidadd"><input id="vd-url" maxlength="600" placeholder="https://youtu.be/…"><input id="vd-title" maxlength="120" placeholder="Title (optional)"><button type="button" class="btn sm ghost" id="vd-add">Add video</button></div>
+  <div class="vidadd"><input id="vd-url" maxlength="600" placeholder="YouTube, Facebook, Instagram, TikTok… link"><input id="vd-title" maxlength="120" placeholder="Title (optional)"><button type="button" class="btn sm ghost" id="vd-add">Add video</button></div>
  </fieldset>
  <fieldset class="qset"><legend>📸 Photos</legend><p class="small">Choose several photos at once. They're resized in your browser before uploading. Up to 80.</p>
   <label class="btn sm ghost upbtn">＋ Add photos<input type="file" id="ph-in" accept="image/jpeg,image/png,image/webp" multiple hidden></label> <span class="small phstat"></span>
@@ -152,7 +155,7 @@ function mediaForm(e){
  <p class="formerr" role="alert"></p>
  <div class="mrow">${e.slug?`<a class="btn ghost" href="/events/${esc(e.slug)}" target="_blank" rel="noopener" style="margin-right:auto">View event page ↗</a>`:''}<button type="button" class="btn ghost" data-close>Cancel</button><button class="btn" type="submit">Save</button></div></form>`,(m,close)=>{
   m.querySelector('.modal').classList.add('wide');
-  const drawV=()=>{$('.vidlist',m).innerHTML=videos.length?videos.map((v,i)=>{const y=ytOf(v.url);return `<div class="vidrow">${y?`<img src="https://i.ytimg.com/vi/${y}/mqdefault.jpg" alt="">`:'<span class="novid">🎬</span>'}<div><input data-vt="${i}" value="${esc(v.title)}" placeholder="Title (optional)" maxlength="120"><small class="small">${esc(v.url)}${y?'':' · not a YouTube link: shown as a button'}</small></div><button type="button" class="linkbtn" data-vu="${i}" ${i?'':'disabled'} aria-label="Move up">↑</button><button type="button" class="linkbtn" data-vx="${i}">Remove</button></div>`}).join(''):'<p class="small muted">No videos yet.</p>';
+  const drawV=()=>{$('.vidlist',m).innerHTML=videos.length?videos.map((v,i)=>{const y=ytOf(v.url);return `<div class="vidrow">${y?`<img src="https://i.ytimg.com/vi/${y}/mqdefault.jpg" alt="">`:`<span class="novid">${HOST_ICON[LIVE_HOST(v.url)]||'🎬'}</span>`}<div><input data-vt="${i}" value="${esc(v.title)}" placeholder="Title (optional)" maxlength="120"><small class="small">${PLAYS(v.url)?`✓ ${esc(LIVE_HOST(v.url))} · plays on the event page`:`${esc(LIVE_HOST(v.url))} · shown as a “Watch” button`} · ${esc(v.url)}</small></div><button type="button" class="linkbtn" data-vu="${i}" ${i?'':'disabled'} aria-label="Move up">↑</button><button type="button" class="linkbtn" data-vx="${i}">Remove</button></div>`}).join(''):'<p class="small muted">No videos yet.</p>';
    $$('[data-vt]',m).forEach(x=>x.oninput=()=>{videos[+x.dataset.vt].title=x.value});
    $$('[data-vx]',m).forEach(x=>x.onclick=()=>{videos.splice(+x.dataset.vx,1);drawV()});
    $$('[data-vu]',m).forEach(x=>x.onclick=()=>{const i=+x.dataset.vu;if(i){[videos[i-1],videos[i]]=[videos[i],videos[i-1]];drawV()}})};

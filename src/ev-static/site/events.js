@@ -90,6 +90,25 @@ $$('[data-s]').forEach(b=>b.onclick=async()=>{if(b.dataset.s==='copy'){try{await
 /* ---------- live stream, videos and photos ---------- */
 const ytEmbed=(id,auto)=>`<iframe src="https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1${auto?'&autoplay=1':''}" title="YouTube video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
 const ytFacade=(id,label,cls='')=>`<button type="button" class="ytf ${cls}" data-yt="${id}" aria-label="Play: ${esc(label)}"><img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="" loading="lazy"><span class="play" aria-hidden="true"></span></button>`;
+/* any video link -> something that plays on the page: {html, shape} (shape: wide | tall | ig), or null for a plain link */
+const ALLOW='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+const frame=(src,title)=>`<iframe src="${esc(src)}" title="${esc(title||'Video')}" allow="${ALLOW}" allowfullscreen loading="lazy"></iframe>`;
+const embedOf=(url,title,live)=>{
+ let u;try{u=new URL(url)}catch(x){return null}
+ const h=u.hostname.replace(/^(www|m|mobile|web)\./,''),p=u.pathname;let m;
+ if(/(youtube\.com|youtu\.be)$/.test(h)){m=/(?:v=|\/live\/|\/embed\/|\/shorts\/|youtu\.be\/)([\w-]{11})/.exec(url);if(!m)return null;return {yt:m[1],shape:/\/shorts\//.test(p)?'tall':'wide'}}
+ if(/(facebook\.com|fb\.watch)$/.test(h)){if(!/\/(videos|reel|watch|share\/[vr])|fb\.watch|story\.php|\/live/.test(url)&&!/fb\.watch/.test(h))return null;
+  return {html:frame(`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false&width=734`,title),shape:/\/reel|\/share\/r/.test(p)?'tall':'wide'}}
+ if(/instagram\.com$/.test(h)){if(live)return null;m=/\/(p|reel|reels|tv)\/([\w-]+)/.exec(p);if(!m)return null;return {html:frame(`https://www.instagram.com/${m[1]==='reels'?'reel':m[1]}/${m[2]}/embed/`,title),shape:'ig'}}
+ if(/tiktok\.com$/.test(h)){m=/\/video\/(\d+)/.exec(p);if(!m)return null;return {html:frame(`https://www.tiktok.com/player/v1/${m[1]}?rel=0`,title),shape:'tall'}}
+ if(/vimeo\.com$/.test(h)){m=/(?:\/video|\/event)?\/(\d+)/.exec(p);if(!m)return null;return {html:frame(`https://player.vimeo.com/video/${m[1]}`,title),shape:'wide'}}
+ if(/linkedin\.com$/.test(h)){m=/(?:activity|ugcPost)[-:](\d{10,})/.exec(url);if(!m)return null;return {html:frame(`https://www.linkedin.com/embed/feed/update/urn:li:${/ugcPost/.test(url)?'ugcPost':'activity'}:${m[1]}`,title),shape:'ig'}}
+ if(/drive\.google\.com$/.test(h)){m=/\/d\/([\w-]{20,})|[?&]id=([\w-]{20,})/.exec(url);if(!m)return null;return {html:frame(`https://drive.google.com/file/d/${m[1]||m[2]}/preview`,title),shape:'wide'}}
+ if(/\.(mp4|webm|mov|m4v)$/i.test(p))return {html:`<video src="${esc(url)}" controls playsinline preload="metadata"></video>`,shape:'wide'};
+ return null};
+const playerHtml=(url,title,opts={})=>{const em=embedOf(url,title,opts.live);if(!em)return '';
+ if(em.yt)return opts.now?`<div class="ytw">${ytEmbed(em.yt,false)}</div>`:`<div class="vshape ${em.shape}">${ytFacade(em.yt,title||'Video',opts.cls||'')}</div>`;
+ return `<div class="vshape ${em.shape}"><div class="ytw">${em.html}</div></div>`};
 const bindYt=r=>$$('[data-yt]',r).forEach(b=>b.onclick=()=>{const w=document.createElement('div');w.className='ytw';w.innerHTML=ytEmbed(b.dataset.yt,true);b.replaceWith(w)});
 let liveWas='';
 const drawLive=()=>{
@@ -97,10 +116,11 @@ const drawLive=()=>{
  const when=local(L.start).toLocaleString('en-GB',{weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit',hour12:true}).replace(' am',' am').replace(' pm',' pm')+' '+E.tzLabel;
  const host=hostName(L.url);
  const pill=st==='live'?'<span class="lvpill on">● Live now</span>':st==='scheduled'?'<span class="lvpill sched">📡 Live scheduled</span>':'<span class="lvpill done">Live stream ended</span>';
- const head=st==='live'?'Watch the event live':st==='scheduled'?`Streaming live on ${esc(when)}`:L.yt?'Watch the recording':'The live stream has ended';
+ const head=st==='live'?'Watch the event live':st==='scheduled'?`Streaming live on ${esc(when)}`:embedOf(L.url,'',true)?'Watch the recording':'The live stream has ended';
  let player='';
- if(L.yt)player=st==='live'?`<div class="ytw">${ytEmbed(L.yt,false)}</div>`:ytFacade(L.yt,head,st==='scheduled'?'sched':'');
- const btn=st==='ended'&&L.yt?'':`<a class="btn ${st==='live'?'livebtn':'line'}" href="${esc(L.url)}" target="_blank" rel="noopener">${st==='scheduled'?(L.yt?'Set a reminder on YouTube':`Open on ${esc(host)}`):st==='live'?`Watch on ${esc(host)}`:`Watch on ${esc(host)}`} ↗</a>`;
+ const plays=!!embedOf(L.url,head,true);
+ player=plays?playerHtml(L.url,head,{live:true,now:st==='live'}):'';
+ const btn=st==='ended'&&plays?'':`<a class="btn ${st==='live'?'livebtn':'line'}" href="${esc(L.url)}" target="_blank" rel="noopener">${st==='scheduled'?(L.yt?'Set a reminder on YouTube':`Open on ${esc(host)}`):st==='live'?`Watch on ${esc(host)}`:`Watch on ${esc(host)}`} ↗</a>`;
  box.innerHTML=`<section class="evlivebox ${st}" aria-live="polite"><div class="lvhead">${pill}<h2>${head}</h2>${btn}</div>${player}</section>`;
  bindYt(box);
  const tag=$('.evdetail .evtags');if(tag){const o=$('.evlive',tag);if(o)o.remove();tag.insertAdjacentHTML('afterbegin',liveTag(E))}
@@ -109,7 +129,7 @@ drawLive();if(E.live){setInterval(drawLive,30e3);setInterval(()=>{if(document.hi
 const MB=$('#evmedia');
 if(MB&&((E.videos||[]).length||(E.photos||[]).length)){
  const V=E.videos||[],P=E.photos||[];
- MB.innerHTML=(V.length?`<section class="evsec"><h2>Videos</h2><div class="vidgrid">${V.map(v=>`<figure>${v.yt?ytFacade(v.yt,v.title||'Video'):`<a class="vidlink" href="${esc(v.url)}" target="_blank" rel="noopener">▶ Watch on ${esc(hostName(v.url))} ↗</a>`}${v.title?`<figcaption>${esc(v.title)}</figcaption>`:''}</figure>`).join('')}</div></section>`:'')+
+ MB.innerHTML=(V.length?`<section class="evsec"><h2>Videos</h2><div class="vidgrid">${V.map(v=>`<figure>${playerHtml(v.url,v.title)||`<a class="vidlink" href="${esc(v.url)}" target="_blank" rel="noopener">▶ Watch on ${esc(hostName(v.url))} ↗</a>`}${v.title?`<figcaption>${esc(v.title)}</figcaption>`:''}</figure>`).join('')}</div></section>`:'')+
   (P.length?`<section class="evsec"><h2>Photos <small>${P.length}</small></h2><div class="phgal">${P.map((u,i)=>`<button type="button" data-ph="${i}" aria-label="Open photo ${i+1} of ${P.length}"><img src="${esc(u)}" alt="Photo ${i+1} from ${esc(E.title)}" loading="lazy"></button>`).join('')}</div></section>`:'');
  bindYt(MB);
  let cur=0;const lb=document.createElement('div');lb.className='evlb';lb.hidden=true;lb.setAttribute('role','dialog');lb.setAttribute('aria-modal','true');lb.setAttribute('aria-label','Photo viewer');

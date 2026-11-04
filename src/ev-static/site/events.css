@@ -203,3 +203,11 @@
 .evlb .x{top:12px;right:12px}.evlb .pv{left:12px;top:50%;margin-top:-24px}.evlb .nx{right:12px;top:50%;margin-top:-24px}
 .evlb .ct{position:absolute;bottom:12px;left:0;right:0;text-align:center;color:#ccc;margin:0;font-size:14px}
 @media (max-width:600px){.phgal{grid-template-columns:repeat(3,1fr);gap:4px}.phgal button{border-radius:6px}.evlb .nv{top:auto;bottom:6px;margin:0}}
+/* video shapes: landscape, portrait (Reels, TikTok, Shorts) and Instagram / LinkedIn posts */
+.vshape{width:100%}
+.vshape.tall{max-width:340px;margin:0 auto}
+.vshape.tall .ytw,.vshape.tall .ytf{aspect-ratio:9/16}
+.vshape.ig{max-width:440px;margin:0 auto}
+.vshape.ig .ytw{aspect-ratio:auto;height:640px;background:#fff;border:1px solid var(--line)}
+.ytw video{position:absolute;inset:0;width:100%;height:100%;background:#000}
+.vidgrid{align-items:start}
