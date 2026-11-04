@@ -25,7 +25,7 @@ const badge=e=>{const d=local(e.start);return `<span class="evdate"><b>${d.getDa
 const sec=$('#events');
 if(sec){
  const card=e=>`<a class="evc ${e.state}" href="/events/${esc(e.slug)}">
-  <div class="evimg">${e.cover?`<img src="${esc(e.cover)}" alt="" loading="lazy">`:'<span class="evph"></span>'}${badge(e)}${liveTag(e)}</div>
+  <div class="evimg">${e.cover?`<img src="${esc(e.cover)}" alt="${esc(e.title)} poster" loading="lazy">`:'<span class="evph"></span>'}${badge(e)}${liveTag(e)}</div>
   <div class="evtxt"><div class="evtags"><span>${e.mode==='online'?'Online':'Offline'}</span><span class="${e.paid?'':'free'}">${esc(price(e))}</span>${e.state!=='open'&&e.state!=='none'?`<span class="st">${STATE[e.state]}</span>`:''}${(e.photos||[]).length?`<span>📸 ${e.photos.length} photos</span>`:''}${(e.videos||[]).length?`<span>🎬 ${e.videos.length} video${e.videos.length===1?'':'s'}</span>`:''}</div>
   <h3>${esc(e.title)}</h3><p class="when">${esc(local(e.start).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}))} · ${esc(timeLine(e))}</p>
   ${e.mode==='offline'&&e.locationName?`<p class="where">${esc(e.locationName)}</p>`:''}${e.summary?`<p class="sum">${esc(e.summary)}</p>`:''}
@@ -58,7 +58,7 @@ const regBtn=()=>{
  if(E.state==='none')return '';
  return `<span class="evstate">${STATE[E.state]}</span>`};
 root.innerHTML=`<article class="evdetail">
- <div class="evhero">${E.cover?`<img src="${esc(E.cover)}" alt="">`:'<span class="evph big"></span>'}</div>
+ <div class="evhero">${E.cover?`<img src="${esc(E.cover)}" alt="${esc(E.title)} poster">`:'<span class="evph big"></span>'}</div>
  <div class="evgridd"><div class="evmain">
   <div class="evtags"><span>${E.mode==='online'?'Online event':'In person'}</span><span class="${E.paid?'':'free'}">${esc(price(E))}</span>${E.state==='open'&&E.seatsLeft!==null&&E.seatsLeft<=15?`<span class="st">Only ${E.seatsLeft} seat${E.seatsLeft===1?'':'s'} left</span>`:''}</div>
   <h1>${esc(E.title)}</h1>${E.summary?`<p class="lead">${esc(E.summary)}</p>`:''}

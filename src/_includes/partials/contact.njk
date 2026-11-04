@@ -1,14 +1,14 @@
 <section class="section" id="contact" style="padding-bottom:60px">
   <div class="wrap">
     <div class="contact-card reveal">
-      <img class="contact-q float" src="/assets/img/aqlyon-q.png" alt="" width="762" height="800">
+      <img class="contact-q float" src="/assets/img/aqlyon-q.png" alt="Aqlyon Brand Management logo" width="762" height="800">
       <div class="contact-left">
         <h2>{{ home.contact.heading_line1 }}<br><span>{{ home.contact.heading_line2 }}</span></h2>
         <div class="contact-lines">
           {% for o in site.offices %}
           <div class="office">
             <p>{{ o.label }}</p>
-            {% if o.logo %}<img class="office-logo" src="{{ o.logo }}" alt="" loading="lazy">{% endif %}
+            {% if o.logo %}<img class="office-logo" src="{{ o.logo }}" alt="{{ o.company }} logo" loading="lazy">{% endif %}
             <b>{{ o.company }}</b>
             {% if o.address %}<address>{{ o.address }}</address>{% endif %}
             <a href="https://wa.me/{{ o.phone | waDigits }}">{{ o.phone }}</a>
