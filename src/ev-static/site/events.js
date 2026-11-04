@@ -63,7 +63,7 @@ root.innerHTML=`<article class="evdetail">
   <div class="evtags"><span>${E.mode==='online'?'Online event':'In person'}</span><span class="${E.paid?'':'free'}">${esc(price(E))}</span>${E.state==='open'&&E.seatsLeft!==null&&E.seatsLeft<=15?`<span class="st">Only ${E.seatsLeft} seat${E.seatsLeft===1?'':'s'} left</span>`:''}</div>
   <h1>${esc(E.title)}</h1>${E.summary?`<p class="lead">${esc(E.summary)}</p>`:''}
   <div class="toprow">${regBtn().replace('id="regbtn"','id="regbtn2"')}${E.share!==false?`<button type="button" class="btn line sharebig">${ICON.share} Share event</button>`:''}</div>
-  <div id="evlive"></div><div class="evbody">${paras(E.details)}</div><div id="evmedia"></div>
+  <div id="evrsvp"></div><div id="evlive"></div><div class="evbody">${paras(E.details)}</div><div id="evmedia"></div>
  </div>
  <aside class="evside"><div class="evbox">
   <p class="row">${ICON.cal}<span><b>${esc(fmtDay(E))}</b>${esc(timeLine(E))}${yt?`<small>Your time: ${esc(yt)}</small>`:''}</span></p>
@@ -86,6 +86,37 @@ const shareNow=async()=>{if(navigator.share){try{await navigator.share({title:E.
  const box=$('.evbox.share');box.scrollIntoView({behavior:'smooth',block:'center'});box.classList.add('flash');setTimeout(()=>box.classList.remove('flash'),1600)};
 $$('.sharebig').forEach(b=>b.onclick=shareNow);
 $$('[data-s]').forEach(b=>b.onclick=async()=>{if(b.dataset.s==='copy'){try{await navigator.clipboard.writeText(url);toast('Link copied')}catch(e){prompt('Copy this link',url)}}else{try{await navigator.share({title:E.title,text:E.summary||E.title,url})}catch(e){}}});
+
+/* ---------- Attending / Maybe / Not attending (events without registration) ---------- */
+const calPop=()=>{
+ const back=document.activeElement,m=document.createElement('div');m.className='evmodal';
+ m.innerHTML=`<div class="evdlg" role="dialog" aria-modal="true" aria-labelledby="cph"><button type="button" class="x" aria-label="Close">×</button><div class="done"><span class="ok">✓</span><h2 id="cph">See you there!</h2>
+  <p>Add <b>${esc(E.title)}</b> to your calendar so you don't miss it.</p><p class="ref">${esc(fmtDay(E))}<br>${esc(timeLine(E))}</p>
+  <div class="row2"><a class="btn solid" href="${gcal()}" target="_blank" rel="noopener" data-done>Google Calendar</a><button type="button" class="btn line" data-ics>Apple / Outlook calendar</button></div>
+  <button type="button" class="lnk" data-done>Not now</button></div></div>`;
+ document.body.appendChild(m);document.body.style.overflow='hidden';
+ const close=()=>{m.remove();document.body.style.overflow='';document.removeEventListener('keydown',esc2);if(back)back.focus()};
+ const esc2=ev=>{if(ev.key==='Escape')close()};document.addEventListener('keydown',esc2);
+ $('.x',m).onclick=close;m.addEventListener('click',ev=>{if(ev.target===m)close()});
+ $$('[data-done]',m).forEach(b=>b.addEventListener('click',()=>setTimeout(close,50)));
+ $('[data-ics]',m).onclick=()=>{ics();setTimeout(close,300)};
+ $('.btn.solid',m).focus();
+};
+const RS=$('#evrsvp');
+if(RS&&E.rsvp&&E.state!=='ended'){
+ const KEY='rsvp:'+E.slug;let mine='';try{mine=localStorage.getItem(KEY)||''}catch(x){}
+ let going=E.going||0,busy=false;
+ const OPTS=[['yes','👍','Attending'],['maybe','🤔','Maybe'],['no','👎','Not attending']];
+ const NOTE={yes:"You're attending. See you there!",maybe:'Marked as maybe. We hope you can make it.',no:'Thanks for letting us know.'};
+ const draw=()=>{RS.innerHTML=`<section class="rsvp"><h2>Are you attending?</h2><div class="rsvpbtns" role="group" aria-label="Are you attending?">${OPTS.map(([k,i,t])=>`<button type="button" class="r-${k}" data-rsvp="${k}" aria-pressed="${mine===k}"><span aria-hidden="true">${i}</span> ${t}</button>`).join('')}</div>
+  <p class="rsvpnote">${mine?NOTE[mine]+(mine==='yes'?' <button type="button" class="lnk" data-cal>Add to calendar</button>':''):'Let the organisers know so they can plan seats.'}${going>=5?` <span class="going">· <b>${going}</b> people attending</span>`:''}</p></section>`;
+  $$('[data-rsvp]',RS).forEach(b=>b.onclick=()=>pick(b.dataset.rsvp));const c=$('[data-cal]',RS);if(c)c.onclick=calPop};
+ const pick=async c=>{if(busy)return;busy=true;const prev=mine,next=c===mine?'':c;mine=next;draw();
+  try{const r=await fetch(`/api/events/${E.slug}/rsvp`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({choice:next,prev})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Could not save your answer.');
+   going=d.counts.yes;try{next?localStorage.setItem(KEY,next):localStorage.removeItem(KEY)}catch(x){}draw();if(next==='yes')calPop()}
+  catch(err){mine=prev;draw();toast(err.message)}finally{busy=false}};
+ draw();
+}
 
 /* ---------- live stream, videos and photos ---------- */
 const ytEmbed=(id,auto)=>`<iframe src="https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1${auto?'&autoplay=1':''}" title="YouTube video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;

@@ -377,3 +377,4 @@ button.ckrow{cursor:pointer}.ckrow small{display:block;color:var(--muted);font-s
 @media (max-width:700px){.vidadd{grid-template-columns:1fr}.vidrow{grid-template-columns:72px minmax(0,1fr) auto}.vidrow img,.vidrow .novid{width:72px;height:40px}.vidrow [data-vu]{display:none}}
 .vidrow input,.vidadd input{font:16px var(--body);padding:9px 11px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);min-width:0}
 .vidrow input{padding:6px 9px;font-size:15px;margin-bottom:2px}
+.rsvpst{display:inline-flex;flex-wrap:wrap;gap:4px 12px}.rsvpst b{font-size:15px}

@@ -211,3 +211,17 @@
 .vshape.ig .ytw{aspect-ratio:auto;height:640px;background:#fff;border:1px solid var(--line)}
 .ytw video{position:absolute;inset:0;width:100%;height:100%;background:#000}
 .vidgrid{align-items:start}
+/* Attending / Maybe / Not attending */
+.rsvp{margin:22px 0 4px;padding:18px;border-radius:22px;background:#fff;border:1px solid var(--line)}
+.rsvp h2{font-size:22px;margin:0 0 12px}
+.rsvpbtns{display:flex;flex-wrap:wrap;gap:8px}
+.rsvpbtns button{flex:1 1 140px;min-height:50px;border-radius:99px;border:2px solid var(--line);background:#fff;font:700 16px var(--body);color:var(--ink);cursor:pointer;transition:background .2s,border-color .2s,transform .15s}
+.rsvpbtns button:hover{border-color:var(--ink)}
+.rsvpbtns button:active{transform:scale(.97)}
+.rsvpbtns button:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.rsvpbtns .r-yes[aria-pressed=true]{background:var(--green);border-color:var(--green);color:var(--ink)}
+.rsvpbtns .r-maybe[aria-pressed=true]{background:var(--sun);border-color:var(--sun)}
+.rsvpbtns .r-no[aria-pressed=true]{background:#ECEEF3;border-color:#C9CCD4}
+.rsvpnote{margin:12px 0 0;color:var(--slate);font-size:15px}
+.rsvpnote .lnk{font:inherit;font-weight:700;color:var(--green-d);background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}
+.rsvpnote .going b{color:var(--ink)}

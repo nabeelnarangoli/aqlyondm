@@ -77,6 +77,7 @@ function clean(b, old = {}) {
   if (b.capacity !== undefined) e.capacity = Math.max(0, parseInt(b.capacity, 10) || 0);
   if (b.form !== undefined) e.form = cleanForm(b.form);
   if (b.share !== undefined) e.share = !!b.share;
+  if (b.rsvp !== undefined) e.rsvp = !!b.rsvp;   // 'No registration' events: Attending / Maybe / Not attending buttons
   if (b.waMsg !== undefined) e.waMsg = waText(b.waMsg); // WhatsApp confirmation message for this event ('' = use the common one)
   if (b.badge !== undefined) e.badge = cleanBadge(b.badge);
   if (b.maxSeats !== undefined) e.maxSeats = Math.min(20, Math.max(1, parseInt(b.maxSeats, 10) || 1));
@@ -118,6 +119,7 @@ function publicEvent(e, list) {
     mode: e.mode, locationName: e.mode === 'offline' ? e.locationName || '' : '', mapUrl: e.mode === 'offline' ? e.mapUrl || '' : '',
     paid: !!e.paid, price: e.price || 0, currency: e.currency || 'AED', regMode: e.regMode, regLink: e.regMode === 'link' ? e.regLink : '',
     form: formOf(e), share: e.share !== false, state: regState(e, list), seatsLeft: e.capacity ? Math.max(0, e.capacity - taken) : null, maxSeats: e.maxSeats || 1,
+    rsvp: e.regMode === 'none' && e.rsvp !== false,
     live: (() => { const li = liveInfo(e); return li ? { ...li, now: liveStatus(li) } : null; })(),
     videos: (e.videos || []).map((v) => ({ yt: ytId(v.url), url: v.url, title: v.title || '' })),
     photos: (e.photos || []).map((id) => `/api/img/${id}`),
@@ -156,6 +158,7 @@ export function createEvents({ getStore, json }) {
     if (Date.now() > endMs + 2 * 864e5) return { error: 'This WhatsApp list has expired because the event is over.' };
     return { l, e };
   }          // files people attach in registration forms            // badge token -> { e: event id, r: registration id }
+  const rsvpCounts = async (id) => ({ yes: 0, maybe: 0, no: 0, ...((await meta().get('rsvp-' + id, { type: 'json' })) || {}) });
   // every registration gets a private badge token; the QR code on the badge holds it
   async function ensureTk(e, r) { if (r.tk) return false; r.tk = crypto.randomBytes(10).toString('hex'); await badges().setJSON(r.tk, { e: e.id, r: r.id }); return true; }
   async function byBadge(tk) {
@@ -221,7 +224,28 @@ export function createEvents({ getStore, json }) {
     if (m && method === 'GET') {
       const e = await bySlug(m[1]);
       if (!e || !e.published) return json(404, { error: 'Event not found.' });
-      return json(200, { event: publicEvent(e, await getRegs(e.id)), whatsapp: (await evSettings()).whatsapp });
+      const pe = publicEvent(e, await getRegs(e.id)); if (pe.rsvp) pe.going = (await rsvpCounts(e.id)).yes;
+      return json(200, { event: pe, whatsapp: (await evSettings()).whatsapp });
+    }
+    // Attending / Maybe / Not attending (events without registration). prev = the visitor's earlier answer, so changing your mind moves the count.
+    m = path.match(/^\/events\/([a-z0-9-]{1,80})\/rsvp$/);
+    if (m && method === 'POST') {
+      const e = await bySlug(m[1]);
+      if (!e || !e.published || e.regMode !== 'none' || e.rsvp === false || ended(e)) return json(404, { error: 'This event is not taking responses.' });
+      const ok = (c) => ['yes', 'maybe', 'no'].includes(c);
+      const choice = ok(body.choice) ? body.choice : '', prev = ok(body.prev) ? body.prev : '';
+      if (choice === prev) return json(200, { counts: await rsvpCounts(e.id) });
+      const ip = req.headers.get('x-nf-client-connection-ip') || req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'local';
+      const ipKey = 'evrsvp-' + crypto.createHash('sha256').update(ip + e.id).digest('hex').slice(0, 24);
+      const rl = (await meta().get(ipKey, { type: 'json' })) || { n: 0, since: Date.now() };
+      if (Date.now() - rl.since > 3600_000) { rl.n = 0; rl.since = Date.now(); }
+      if (rl.n >= 25) return json(429, { error: 'Too many answers from here. Please try again later.' });
+      rl.n += 1; await meta().setJSON(ipKey, rl);
+      const c = await rsvpCounts(e.id);
+      if (prev) c[prev] = Math.max(0, c[prev] - 1);
+      if (choice) c[choice] += 1;
+      c.at = new Date().toISOString(); await meta().setJSON('rsvp-' + e.id, c);
+      return json(200, { counts: c });
     }
     m = path.match(/^\/send\/([a-f0-9]{24})(?:\/([a-f0-9]{16}))?$/);
     if (m) {
@@ -376,7 +400,7 @@ export function createEvents({ getStore, json }) {
     }
     if (path === '/admin/events' && method === 'GET') {
       const out = [];
-      for (const e of await all()) { const list = await getRegs(e.id); out.push({ ...e, state: regState(e, list), liveNow: liveStatus(liveInfo(e)), counts: { total: list.length, seats: seatsTaken(list), pending: list.filter((r) => r.status === 'pending').length, attended: list.filter((r) => calOk(r) && r.attended).reduce((t, r) => t + (r.seats || 1), 0) } }); }
+      for (const e of await all()) { const list = await getRegs(e.id); out.push({ ...e, state: regState(e, list), liveNow: liveStatus(liveInfo(e)), rsvpCounts: e.regMode === 'none' ? await rsvpCounts(e.id) : null, counts: { total: list.length, seats: seatsTaken(list), pending: list.filter((r) => r.status === 'pending').length, attended: list.filter((r) => calOk(r) && r.attended).reduce((t, r) => t + (r.seats || 1), 0) } }); }
       out.sort((a, b) => toUTC(b.start, b.tz) - toUTC(a.start, a.tz));
       return json(200, { events: out, settings: adminSettings(await rawSettings()) });
     }
@@ -539,7 +563,7 @@ export function createEvents({ getStore, json }) {
       if (!m[2] && method === 'DELETE') {
         for (const r of await getRegs(e.id)) for (const v of Object.values(r.answers || {})) if (v && v.id && v.size !== undefined) await uploads().delete(v.id);
         if (e.staffKey) await meta().delete('staff-' + e.staffKey);
-        await store.delete(e.id); await regs().delete(e.id); if (e.cover) await images().delete(e.cover); if (e.badge && e.badge.logo) await images().delete(e.badge.logo); for (const id of (e.photos || [])) await images().delete(id); return json(200, { ok: true }); }
+        await store.delete(e.id); await regs().delete(e.id); if (e.cover) await images().delete(e.cover); if (e.badge && e.badge.logo) await images().delete(e.badge.logo); for (const id of (e.photos || [])) await images().delete(id); await meta().delete('rsvp-' + e.id); return json(200, { ok: true }); }
     }
     return null;
   }
@@ -565,7 +589,7 @@ export function createEvents({ getStore, json }) {
   async function page(slug, origin) {
     const e = await bySlug(slug);
     if (!e || !e.published) return new Response(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Event not found</title><body style="font-family:Inter,system-ui,sans-serif;padding:40px;text-align:center;background:#F2F3EF;color:#0B0B0B"><h1>Event not found</h1><p><a href="/events/">See upcoming events</a></p>`, { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } });
-    const pe = publicEvent(e, await getRegs(e.id));
+    const pe = publicEvent(e, await getRegs(e.id)); if (pe.rsvp) pe.going = (await rsvpCounts(e.id)).yes;
     const desc = (e.summary || e.details || '').replace(/\s+/g, ' ').slice(0, 200);
     const img = pe.cover ? origin + pe.cover : origin + '/img/og-default.png';
     const url = `${origin}/events/${e.slug}`;
