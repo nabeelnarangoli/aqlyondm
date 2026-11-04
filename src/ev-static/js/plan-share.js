@@ -12,13 +12,11 @@ const blocked=msg=>{main.innerHTML=`<div class="empty" style="margin-top:30px"><
 async function call(path='',opts={}){let r;try{r=await fetch('/api/plan/'+KEY+path,{method:opts.method||'GET',headers:{'content-type':'application/json'},body:opts.body?JSON.stringify(opts.body):undefined})}catch(e){throw new Error('No internet connection. Try again.')}
  let d={};try{d=await r.json()}catch(e){}if(r.status===403){blocked(d.error||'This link is not valid.');throw new Error(d.error)}if(!r.ok)throw new Error(d.error||'Something went wrong.');return d}
 function draw(){
- const k=PV.count(D.plan.checklists),P=D.plan.program,tot=PV.total(P);
- main.innerHTML=`<div class="plteam">${PV.head(D.event)}</div><div class="evbtns" style="margin:0 0 12px"><button type="button" class="btn sm ghost" id="pp">🖨 Print / PDF</button></div>
- <div class="ckcount"><b>${k.d}</b> of ${k.n} tasks done${P.items.length?` · program ${PV.dur(tot)}`:''}<div class="ckprog"><i style="width:${PV.pct(k)}%"></i></div></div>
- ${D.tick?`<div class="field plme"><label for="me">Your name <small>(shown next to the items you tick)</small></label><input id="me" maxlength="60" value="${esc(me)}" placeholder="e.g. Shameer" autocomplete="name"></div>`:'<p class="tipbox small">View only. Ask the organiser if you need to tick items off.</p>'}
- <nav class="evsub" role="tablist"><button type="button" role="tab" data-t="lists" class="${tab==='lists'?'on':''}" aria-selected="${tab==='lists'}">✅ Checklists <i>${k.d}/${k.n}</i></button><button type="button" role="tab" data-t="program" class="${tab==='program'?'on':''}" aria-selected="${tab==='program'}">🕒 Program chart <i>${P.items.length}</i></button></nav>
- <div class="plview">${tab==='lists'?PV.lists(D.plan,{tick:D.tick,hideEmpty:true}):PV.program(D.plan)}</div>`;
- $$('[data-t]').forEach(b=>b.onclick=()=>{tab=b.dataset.t;draw()});
+ const k=PV.count(D.plan.checklists),P=D.plan.program,prog=D.kind==='program';tab=prog?'program':'lists';
+ main.innerHTML=`<div class="plteam">${PV.head(D.event)}</div><div class="plkind"><h2>${prog?'🕒 Program chart':'✅ Preparation checklist'}</h2><button type="button" class="btn sm ghost" id="pp">🖨 Print ${prog?'program chart':'checklist'}</button></div>
+ ${prog?'':`<div class="ckcount"><b>${k.d}</b> of ${k.n} tasks done<div class="ckprog"><i style="width:${PV.pct(k)}%"></i></div></div>
+ ${D.tick?`<div class="field plme"><label for="me">Your name <small>(shown next to the items you tick)</small></label><input id="me" maxlength="60" value="${esc(me)}" placeholder="e.g. Shameer" autocomplete="name"></div>`:'<p class="tipbox small">View only. Ask the organiser if you need to tick items off.</p>'}`}
+ <div class="plview">${prog?PV.program(D.plan):PV.lists(D.plan,{tick:D.tick,hideEmpty:true})}</div>`;
  $('#pp').onclick=()=>{if(!PV.print(D.plan,D.event,tab))toast('Allow pop-ups to print.',true)};
  const mi=$('#me');if(mi)mi.oninput=()=>{me=mi.value.trim();store.set('plan-name',me)};
  $$('[data-item]').forEach(cb=>cb.onchange=async()=>{

@@ -11,18 +11,18 @@ const plId=()=>Math.random().toString(36).slice(2,10).padEnd(8,'0');
 
 async function planView(e,tab0){
  const main=$('.adm');main.innerHTML=evHeadHTML(e,'plan')+'<p class="lead" style="margin-top:20px">Loading the planner…</p>';bindEvHead(e);
- let P,SH;try{const d=await AAPI.call(`/admin/events/${e.id}/plan`);P=d.plan;SH=d.share||{}}catch(err){toast(err.message,true);return}
+ let P,SH;try{const d=await AAPI.call(`/admin/events/${e.id}/plan`);P=d.plan;SH=d.shares||{lists:{},program:{}}}catch(err){toast(err.message,true);return}
  if(!P.program.start&&/T\d{2}:\d{2}$/.test(e.start||''))P.program.start=e.start.slice(11,16);
  let tab=tab0||'lists',timer=0,saving=false,dirty=false;
  const PV=window.PlanView,ev={title:e.title,when:evDate(e),venue:e.mode==='offline'?e.locationName||'':'Online',org:(e.badge||{}).org||'',logo:(e.badge||{}).logo?'/api/img/'+e.badge.logo:''};
  main.innerHTML=evHeadHTML(e,'plan')+`<div class="plhead"><button type="button" class="plorg" id="plorg" aria-label="Organiser name and logo"></button><div class="pltop"><span class="plsum"></span><span class="plsave small" aria-live="polite"></span></div>
-  <div class="evbtns" style="margin:0"><button type="button" class="btn sm" id="plshare">🔗 Share with team</button><button type="button" class="btn sm ghost" id="plprint">🖨 Print / PDF</button></div></div>
+  <div class="evbtns" style="margin:0"><button type="button" class="btn sm" id="plshare">🔗 Share</button><button type="button" class="btn sm ghost" id="plprint">🖨 Print / PDF</button></div></div>
   <nav class="evsub" role="tablist" aria-label="Planner"><button type="button" role="tab" data-pt="lists">✅ Checklists</button><button type="button" role="tab" data-pt="program">🕒 Program chart</button></nav>
   <div class="plbody"></div>`;
  bindEvHead(e);
  const body=$('.plbody',main);
  const stat=(t,bad)=>{const s=$('.plsave',main);if(s){s.textContent=t;s.classList.toggle('bad',!!bad)}};
- const summary=()=>{const k=PV.count(P.checklists),t=PV.total(P.program);$('.plsum',main).innerHTML=`<b>${k.d}</b> of ${k.n} tasks done · program ${PV.dur(t)}${SH.on?' · <span class="plshared">Shared with team</span>':''}`};
+ const summary=()=>{const k=PV.count(P.checklists),t=PV.total(P.program);$('.plsum',main).innerHTML=`<b>${k.d}</b> of ${k.n} tasks done · program ${PV.dur(t)}${SH.lists.on||SH.program.on?` · <span class="plshared">Shared: ${[SH.lists.on&&'checklist',SH.program.on&&'program chart'].filter(Boolean).join(' and ')}</span>`:''}`};
  const save=()=>{dirty=true;stat('Saving…');summary();clearTimeout(timer);timer=setTimeout(flush,700)};
  const flush=async()=>{if(saving){timer=setTimeout(flush,400);return}saving=true;dirty=false;
   try{const d=await AAPI.call(`/admin/events/${e.id}/plan`,{method:'PUT',body:{checklists:P.checklists,program:P.program}});merge(d.plan);stat(dirty?'Saving…':'All changes saved ✓')}
@@ -34,7 +34,7 @@ async function planView(e,tab0){
   if(changed){summary();if(tab==='lists')$$('.plcat',body).forEach(cc=>catProg(cc))}};
  const catProg=el=>{const c=P.checklists.find(x=>x.id===el.dataset.cat);if(!c)return;const k=PV.count([c]);const s=$('.plpill',el);if(s){s.textContent=`${k.d} / ${k.n} done`;s.classList.toggle('all',!!k.n&&k.d===k.n)}const b=$('.plbar i',el);if(b)b.style.width=PV.pct(k)+'%'};
  const poll=setInterval(async()=>{if(!document.body.contains(body)){clearInterval(poll);return}if(dirty||saving||document.hidden)return;
-  try{const d=await AAPI.call(`/admin/events/${e.id}/plan`);merge(d.plan);SH=d.share||SH}catch(x){}},20e3);
+  try{const d=await AAPI.call(`/admin/events/${e.id}/plan`);merge(d.plan);SH=d.shares||SH}catch(x){}},20e3);
 
  /* ---------- checklists ---------- */
  const find=(cid,gid)=>{const c=P.checklists.find(x=>x.id===cid);return {c,g:c&&gid?c.groups.find(x=>x.id===gid):null}};
@@ -111,27 +111,29 @@ async function planView(e,tab0){
   P.program.items.push({id:plId(),title:t,dur:Math.max(0,parseInt($('#pa-dur',body).value,10)||0),who:$('#pa-who',body).value.trim(),note:''});save();drawProgram('#pa-title')};
 
  /* ---------- tabs, share, print ---------- */
- const go=t=>{tab=t;$$('[data-pt]',main).forEach(b=>{const on=b.dataset.pt===t;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});t==='program'?drawProgram():drawLists()};
+ const go=t=>{tab=t;$$('[data-pt]',main).forEach(b=>{const on=b.dataset.pt===t;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
+  const what=t==='program'?'program chart':'checklist';$('#plshare',main).textContent='🔗 Share '+what;$('#plprint',main).textContent='🖨 Print '+what;t==='program'?drawProgram():drawLists()};
  $$('[data-pt]',main).forEach(b=>b.onclick=()=>go(b.dataset.pt));
- $('#plprint',main).onclick=async()=>{if(dirty){clearTimeout(timer);await flush()}if(!PV.print(P,ev,'both'))toast('Allow pop-ups to print.',true)};
+ $('#plprint',main).onclick=async()=>{if(dirty){clearTimeout(timer);await flush()}if(!PV.print(P,ev,tab))toast('Allow pop-ups to print.',true)};
  const orgBtn=()=>{$('#plorg',main).innerHTML=ev.logo?`<img src="${esc(ev.logo)}" alt=""><span>${esc(ev.org||'Organiser')}<small>Change</small></span>`:`<span class="plorgadd">＋</span><span>Organiser logo<small>Shown on the team link and print-out</small></span>`};
  $('#plorg',main).onclick=()=>planOrg(e,ev,orgBtn);orgBtn();
- $('#plshare',main).onclick=()=>planShare(e,SH,s=>{SH=s;summary()});
+ $('#plshare',main).onclick=()=>planShare(e,tab,SH[tab]||{},all=>{SH=all;summary()});
  summary();stat('All changes saved ✓');go(tab);
 }
 
-function planShare(e,SH,onChange){
+function planShare(e,kind,SH,onChange){
+ const prog=kind==='program',what=prog?'program chart':'checklist';
  const link=()=>location.origin+'/plan#'+SH.key;
- modal(`<h2>Share the planner</h2><p class="small" style="margin-top:-4px">Send this link to your team on WhatsApp. They can see the checklists and the program chart without logging in.</p>
+ modal(`<h2>Share the ${what}</h2><p class="small" style="margin-top:-4px">${prog?'This link shows <b>only the program chart</b>: handy for the anchor, stage team and guests.':'This link shows <b>only the preparation checklist</b>, not the program chart.'} People open it without logging in.</p>
   <label class="ck"><input type="checkbox" id="ps-on" ${SH.on?'checked':''}><span><b>Link is on</b>: untick to stop the link working.</span></label>
-  <label class="ck"><input type="checkbox" id="ps-tick" ${SH.tick!==false?'checked':''}><span><b>Team can tick items off</b>: they type their name once, and you see who ticked what. Untick for view only.</span></label>
-  <div class="pslink" ${SH.on?'':'hidden'}><div class="field"><label for="ps-url">Team link</label><input id="ps-url" readonly value="${SH.key?esc(link()):''}"></div>
+  ${prog?'':`<label class="ck"><input type="checkbox" id="ps-tick" ${SH.tick!==false?'checked':''}><span><b>Team can tick items off</b>: they type their name once, and you see who ticked what. Untick for view only.</span></label>`}
+  <div class="pslink" ${SH.on?'':'hidden'}><div class="field"><label for="ps-url">${prog?'Program chart':'Checklist'} link</label><input id="ps-url" readonly value="${SH.key?esc(link()):''}"></div>
    <div class="evbtns"><button type="button" class="btn sm" id="ps-copy">Copy link</button><a class="btn sm ghost" id="ps-wa" target="_blank" rel="noopener">Send on WhatsApp</a><a class="btn sm ghost" id="ps-open" target="_blank" rel="noopener">Open ↗</a><button type="button" class="linkbtn" id="ps-new">Make a new link (old one stops working)</button></div></div>
   <div class="mrow"><button type="button" class="btn" data-close>Done</button></div>`,(m,close)=>{
-  const sync=()=>{$('.pslink',m).hidden=!SH.on;if(SH.key){$('#ps-url',m).value=link();$('#ps-open',m).href=link();$('#ps-wa',m).href=waLink('',`Planner for ${e.title}: checklists and program chart\n${link()}`)}};
-  const send=async body=>{try{const d=await AAPI.call(`/admin/events/${e.id}/plan/share`,{method:'POST',body});SH=d.share;onChange(SH);sync()}catch(err){toast(err.message,true)}};
+  const sync=()=>{$('.pslink',m).hidden=!SH.on;if(SH.key){$('#ps-url',m).value=link();$('#ps-open',m).href=link();$('#ps-wa',m).href=waLink('',`${prog?'Program chart':'Preparation checklist'} for ${e.title}\n${link()}`)}};
+  const send=async body=>{try{const d=await AAPI.call(`/admin/events/${e.id}/plan/share`,{method:'POST',body:{...body,kind}});SH=d.shares[kind];onChange(d.shares);sync()}catch(err){toast(err.message,true)}};
   $('#ps-on',m).onchange=ev=>send({on:ev.target.checked});
-  $('#ps-tick',m).onchange=ev=>send({tick:ev.target.checked});
+  const tk=$('#ps-tick',m);if(tk)tk.onchange=ev=>send({tick:ev.target.checked});
   $('#ps-copy',m).onclick=()=>copy(link());
   $('#ps-new',m).onclick=async()=>{if(await confirmBox('Make a new link?','The current link will stop working for everyone who has it.','Make new link',true))send({on:true,reset:true})};
   sync();
