@@ -26,6 +26,12 @@
   to = "/send.html"
   status = 200
 
+# Event planner shared with the team (/plan#<key>)
+[[redirects]]
+  from = "/plan"
+  to = "/plan.html"
+  status = 200
+
 [[headers]]
   for = "/assets/*"
   [headers.values]

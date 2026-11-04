@@ -71,6 +71,8 @@ function modal(html,onReady){const m=document.createElement('div');m.className='
  // clicking outside closes only simple messages; a window with things to fill in closes with its own buttons, so nothing typed is lost
  let downOut=false;m.addEventListener('pointerdown',e=>{downOut=e.target===m});
  m.addEventListener('click',e=>{if(e.target.closest('[data-close]'))return close();if(e.target===m&&downOut&&!m.querySelector('input:not([type=checkbox]):not([type=radio]),textarea,select'))close()});document.addEventListener('keydown',function k(e){if(!m.isConnected)return document.removeEventListener('keydown',k);if(e.key==='Escape'&&m===[...document.querySelectorAll('.modalbg')].pop()){close();document.removeEventListener('keydown',k)}});onReady&&onReady(m,close);return close}
+// copy text (links) to the clipboard; older phones get a box to copy from
+async function copy(t){try{await navigator.clipboard.writeText(t);toast('Link copied')}catch(e){prompt('Copy this link',t)}}
 function confirmBox(title,text,okLabel,danger){return new Promise(res=>modal(`<h2>${title}</h2><p>${text}</p><div class="mrow"><button type="button" class="btn ghost" data-close>Cancel</button><button type="button" class="btn ${danger?'danger':''} ok">${okLabel}</button></div>`,(m,close)=>{$('.ok',m).onclick=()=>{close();res(true)};m.addEventListener('click',e=>{if(e.target.closest('[data-close]')||e.target===m)res(false)})}))}
 
 function loginView(msg=''){

@@ -4,6 +4,8 @@
 import crypto from 'node:crypto';
 import { createEvents } from './events.mjs';
 import { createSeo } from './seo.mjs';
+import { createPlans } from './plans.mjs';
+import { whenText } from './invite-mail.mjs';
 
 const MAX_BODY = 300_000;
 const json = (status, body) => new Response(JSON.stringify(body), {
@@ -43,6 +45,7 @@ export function createHandler({ getStore, env }) {
 
   const EV = createEvents({ getStore, json });
   const SEO = createSeo({ getStore, json, env });
+  const PL = createPlans({ getStore, json, eventsStore: () => getStore('events'), whenText });
 
   return async function handle(req) {
     const { admin, secret } = cfg();
@@ -85,7 +88,10 @@ export function createHandler({ getStore, env }) {
         const r = await SEO.routes({ path, method, body: method === 'GET' ? Object.fromEntries(url.searchParams) : body });
         if (r) return r;
       }
+      const plr = await PL.routes({ path, method, body, auth });   // event planner: checklists + program chart
+      if (plr) return plr;
       const evr = await EV.routes({ path, method, body, req, auth });
+      if (evr && method === 'DELETE' && evr.status === 200 && /^\/admin\/events\/[a-f0-9]{16}$/.test(path)) await PL.remove(path.split('/').pop());
       if (evr) return evr;
       return json(404, { error: 'Not found.' });
     } catch (err) {
