@@ -24,15 +24,17 @@ function program(plan){
   ${P.items.map((i,n)=>`<tr><td class="t">${T[n].from?`<b>${T[n].from}</b><small>to ${T[n].to}</small>`:`<b>${n+1}</b>`}</td><td class="p">${esc(i.title||'–')}</td><td class="d">${dur(i.dur)}</td><td>${i.who?`<b>${esc(i.who)}</b>`:''}${i.note?`<small>${esc(i.note)}</small>`:''}</td></tr>`).join('')}
  </tbody></table><p class="pltot">${P.items.length} item${P.items.length===1?'':'s'} · total ${dur(tot)}${P.start?` · ${clock(toMin(P.start))} to ${clock(toMin(P.start)+tot)}`:''}</p></div>`;
 }
+/* page header: the organiser's logo (from the event's badge design) or the Aqlyon mark */
+const head=(ev,abs)=>{const o=abs?location.origin:'';return `<header class="plph">${ev.logo?`<img class="orglogo" src="${o}${esc(ev.logo)}" alt="${esc(ev.org||'Organiser')} logo">`:`<img src="${o}/img/aqlyon-q.png" alt="" width="34" height="34">`}<div><h1>${esc(ev.title)}</h1><p>${ev.org?`<b>${esc(ev.org)}</b> · `:''}${esc(ev.when||'')}${ev.venue?' · '+esc(ev.venue):''}</p></div>${ev.logo?`<span class="plby"><img src="${o}/img/aqlyon-q.png" alt="" width="18" height="18">Planned with Aqlyon</span>`:''}</header>`};
 /* a printable page in a new window: which = 'lists' | 'program' | 'both' */
 function print(plan,ev,which='both'){
  const w=window.open('','_blank');if(!w)return false;
  let css='';for(const sh of document.styleSheets){try{if(/plan\.css/.test(sh.href||''))css+=[...sh.cssRules].map(r=>r.cssText).join('\n')}catch(x){}}
  w.document.write(`<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${esc(ev.title)} · ${which==='program'?'Program chart':which==='lists'?'Checklists':'Event plan'}</title>${css?`<style>${css}</style>`:`<link rel="stylesheet" href="${location.origin}/css/plan.css">`}</head><body class="plprint">
-  <header class="plph"><img src="${location.origin}/img/aqlyon-q.png" alt="" width="34" height="34"><div><h1>${esc(ev.title)}</h1><p>${esc(ev.when||'')}${ev.venue?' · '+esc(ev.venue):''}</p></div></header>
+  ${head(ev,true)}
   ${which!=='lists'?`<h2 class="plsec">Program chart</h2>${program(plan)}`:''}${which!=='program'?`<h2 class="plsec">Preparation checklist</h2>${lists(plan,{hideEmpty:true})}`:''}
-  <script>setTimeout(()=>print(),500)<\/script></body></html>`);
+  <script>window.onload=()=>setTimeout(()=>print(),300)<\/script></body></html>`);
  w.document.close();return true;
 }
-return {esc,toMin,clock,times,total,dur,count,pct,lists,program,print};
+return {head,esc,toMin,clock,times,total,dur,count,pct,lists,program,print};
 })();

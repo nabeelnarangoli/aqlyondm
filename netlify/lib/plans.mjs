@@ -46,7 +46,8 @@ export function createPlans({ getStore, json, eventsStore, whenText }) {
     if (!e || !p.share || !p.share.on || p.share.key !== key) return { error: 'This planner link has been turned off or replaced. Ask the organiser for the current link.' };
     return { e, p };
   }
-  const evInfo = (e) => ({ title: e.title, start: e.start, when: whenText ? whenText(e) : e.start, venue: e.mode === 'offline' ? e.locationName || '' : 'Online' });
+  const evInfo = (e) => ({ title: e.title, start: e.start, when: whenText ? whenText(e) : e.start, venue: e.mode === 'offline' ? e.locationName || '' : 'Online',
+    org: (e.badge && e.badge.org) || '', logo: e.badge && /^[a-f0-9]{24}$/.test(e.badge.logo || '') ? `/api/img/${e.badge.logo}` : '' });
 
   async function routes({ path, method, body, auth }) {
     /* ---------- team link ---------- */

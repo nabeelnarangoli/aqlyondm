@@ -13,7 +13,7 @@ async function call(path='',opts={}){let r;try{r=await fetch('/api/plan/'+KEY+pa
  let d={};try{d=await r.json()}catch(e){}if(r.status===403){blocked(d.error||'This link is not valid.');throw new Error(d.error)}if(!r.ok)throw new Error(d.error||'Something went wrong.');return d}
 function draw(){
  const k=PV.count(D.plan.checklists),P=D.plan.program,tot=PV.total(P);
- main.innerHTML=`<div class="admhead"><div><h1 style="margin-bottom:2px">${esc(D.event.title)}</h1><p class="small">${esc(D.event.when)}${D.event.venue?' · '+esc(D.event.venue):''}</p></div><button type="button" class="btn sm ghost" id="pp">🖨 Print / PDF</button></div>
+ main.innerHTML=`<div class="plteam">${PV.head(D.event)}</div><div class="evbtns" style="margin:0 0 12px"><button type="button" class="btn sm ghost" id="pp">🖨 Print / PDF</button></div>
  <div class="ckcount"><b>${k.d}</b> of ${k.n} tasks done${P.items.length?` · program ${PV.dur(tot)}`:''}<div class="ckprog"><i style="width:${PV.pct(k)}%"></i></div></div>
  ${D.tick?`<div class="field plme"><label for="me">Your name <small>(shown next to the items you tick)</small></label><input id="me" maxlength="60" value="${esc(me)}" placeholder="e.g. Shameer" autocomplete="name"></div>`:'<p class="tipbox small">View only. Ask the organiser if you need to tick items off.</p>'}
  <nav class="evsub" role="tablist"><button type="button" role="tab" data-t="lists" class="${tab==='lists'?'on':''}" aria-selected="${tab==='lists'}">✅ Checklists <i>${k.d}/${k.n}</i></button><button type="button" role="tab" data-t="program" class="${tab==='program'?'on':''}" aria-selected="${tab==='program'}">🕒 Program chart <i>${P.items.length}</i></button></nav>

@@ -438,3 +438,11 @@ button.ckrow{cursor:pointer}.ckrow small{display:block;color:var(--muted);font-s
  .plcathead .placts{grid-row:1;grid-column:2}
 }
 .plview{margin-top:14px}.plme{max-width:420px;margin:0 0 12px}.plme input.need{border-color:#D93A3F}
+.plorg{display:flex;align-items:center;gap:10px;border:1px dashed var(--line);background:var(--surface);border-radius:14px;padding:6px 12px 6px 6px;cursor:pointer;color:var(--ink);font:inherit;text-align:left;min-height:56px}
+.plorg:hover{border-color:var(--accent)}
+.plorg img{height:44px;width:auto;max-width:110px;object-fit:contain;border-radius:6px}
+.plorg span{display:flex;flex-direction:column;font-weight:700;font-size:14px;line-height:1.25}
+.plorg small{font-weight:400;color:var(--muted);font-size:12.5px}
+.plorgadd{width:44px;height:44px;border-radius:10px;background:var(--soft);align-items:center;justify-content:center;font-size:22px!important}
+.plhead .pltop{flex:1;min-width:200px}
+.polprev img{object-fit:contain!important;background:repeating-conic-gradient(var(--soft) 0 25%,transparent 0 50%) 0 0/16px 16px}

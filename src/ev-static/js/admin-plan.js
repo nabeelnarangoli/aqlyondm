@@ -14,8 +14,8 @@ async function planView(e,tab0){
  let P,SH;try{const d=await AAPI.call(`/admin/events/${e.id}/plan`);P=d.plan;SH=d.share||{}}catch(err){toast(err.message,true);return}
  if(!P.program.start&&/T\d{2}:\d{2}$/.test(e.start||''))P.program.start=e.start.slice(11,16);
  let tab=tab0||'lists',timer=0,saving=false,dirty=false;
- const PV=window.PlanView,ev={title:e.title,when:evDate(e),venue:e.mode==='offline'?e.locationName||'':'Online'};
- main.innerHTML=evHeadHTML(e,'plan')+`<div class="plhead"><div class="pltop"><span class="plsum"></span><span class="plsave small" aria-live="polite"></span></div>
+ const PV=window.PlanView,ev={title:e.title,when:evDate(e),venue:e.mode==='offline'?e.locationName||'':'Online',org:(e.badge||{}).org||'',logo:(e.badge||{}).logo?'/api/img/'+e.badge.logo:''};
+ main.innerHTML=evHeadHTML(e,'plan')+`<div class="plhead"><button type="button" class="plorg" id="plorg" aria-label="Organiser name and logo"></button><div class="pltop"><span class="plsum"></span><span class="plsave small" aria-live="polite"></span></div>
   <div class="evbtns" style="margin:0"><button type="button" class="btn sm" id="plshare">🔗 Share with team</button><button type="button" class="btn sm ghost" id="plprint">🖨 Print / PDF</button></div></div>
   <nav class="evsub" role="tablist" aria-label="Planner"><button type="button" role="tab" data-pt="lists">✅ Checklists</button><button type="button" role="tab" data-pt="program">🕒 Program chart</button></nav>
   <div class="plbody"></div>`;
@@ -114,6 +114,8 @@ async function planView(e,tab0){
  const go=t=>{tab=t;$$('[data-pt]',main).forEach(b=>{const on=b.dataset.pt===t;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});t==='program'?drawProgram():drawLists()};
  $$('[data-pt]',main).forEach(b=>b.onclick=()=>go(b.dataset.pt));
  $('#plprint',main).onclick=async()=>{if(dirty){clearTimeout(timer);await flush()}if(!PV.print(P,ev,'both'))toast('Allow pop-ups to print.',true)};
+ const orgBtn=()=>{$('#plorg',main).innerHTML=ev.logo?`<img src="${esc(ev.logo)}" alt=""><span>${esc(ev.org||'Organiser')}<small>Change</small></span>`:`<span class="plorgadd">＋</span><span>Organiser logo<small>Shown on the team link and print-out</small></span>`};
+ $('#plorg',main).onclick=()=>planOrg(e,ev,orgBtn);orgBtn();
  $('#plshare',main).onclick=()=>planShare(e,SH,s=>{SH=s;summary()});
  summary();stat('All changes saved ✓');go(tab);
 }
@@ -133,5 +135,22 @@ function planShare(e,SH,onChange){
   $('#ps-copy',m).onclick=()=>copy(link());
   $('#ps-new',m).onclick=async()=>{if(await confirmBox('Make a new link?','The current link will stop working for everyone who has it.','Make new link',true))send({on:true,reset:true})};
   sync();
+ });
+}
+
+/* organiser name + logo: saved in the event's badge design, shown on the planner print-out and team link */
+function planOrg(e,ev,done){
+ let logo=(e.badge||{}).logo||'';
+ modal(`<h2>Organiser</h2><p class="small" style="margin-top:-4px">Shown at the top of the planner's team link and print-out, and on the event's name badges.</p>
+  <div class="field"><label for="po-name">Organiser name</label><input id="po-name" maxlength="80" value="${esc((e.badge||{}).org||'')}" placeholder="e.g. Dubai KMCC Kozhikode District Committee"></div>
+  <div class="field"><label>Organiser logo</label><div class="evcover"><div class="evcprev polprev">${logo?`<img src="/api/img/${logo}" alt="">`:'<span>No logo yet</span>'}</div><div><input type="file" id="po-file" accept="image/png,image/jpeg,image/webp"><small class="small">A PNG with a transparent background looks best.</small>${logo?'<button type="button" class="linkbtn po-rm">Remove logo</button>':''}</div></div></div>
+  <p class="formerr" role="alert"></p><div class="mrow"><button type="button" class="btn ghost" data-close>Cancel</button><button type="button" class="btn" id="po-save">Save</button></div>`,(m,close)=>{
+  $('#po-file',m).onchange=async ev2=>{const f=ev2.target.files[0];if(!f)return;const pv=$('.polprev',m);pv.innerHTML='<span>Uploading…</span>';
+   try{const img=await prepImage(f);const d=await AAPI.call('/admin/upload',{method:'POST',body:{type:img.type,data:img.data}});logo=d.id;pv.innerHTML=`<img src="${img.preview}" alt="">`}catch(err){pv.innerHTML='<span>Upload failed</span>';toast(err.message,true)}};
+  const rm=$('.po-rm',m);if(rm)rm.onclick=()=>{logo='';$('.polprev',m).innerHTML='<span>No logo</span>'};
+  $('#po-save',m).onclick=async()=>{const b=$('#po-save',m);b.disabled=true;
+   try{const badge={...(e.badge||{}),org:$('#po-name',m).value.trim(),logo};const d=await AAPI.call('/admin/events/'+e.id,{method:'PATCH',body:{badge}});
+    e.badge=d.event.badge;ev.org=e.badge.org||'';ev.logo=e.badge.logo?'/api/img/'+e.badge.logo:'';close();done();toast('Organiser saved')}
+   catch(err){$('.formerr',m).textContent=err.message;b.disabled=false}};
  });
 }
