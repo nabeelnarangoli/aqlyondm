@@ -7,6 +7,8 @@ const PL_START=[
  {title:'Venue & Logistics',groups:[''],items:['Sound and light check','Seating plan','Reception desk','Photographer and videographer']},
 ];
 const PL_PROG=[['National Anthem',2],['Welcome Speech',10],['Presidential Address',10],['Inauguration',15],['Chief Guest Address',20],['Award Presentation',20],['Vote of Thanks',5]];
+// list markers at the start of a pasted line: 1.  1)  (1)  1 -  -  •  *  a)
+const PL_MARK=/^\s*(?:\(?\d{1,3}\s*[.)\]:：-]|\(\d{1,3}\)|\d{1,3}\s+[-–]|[-–•*·●▪◦➤►✓✔]|[a-z][.)](?=\s))\s*/i;
 const plId=()=>Math.random().toString(36).slice(2,10).padEnd(8,'0');
 
 async function planView(e,tab0){
@@ -51,7 +53,7 @@ async function planView(e,tab0){
     <ol class="plitems">${g.items.map((i,ii)=>`<li class="${i.done?'done':''}" data-item="${i.id}"><input type="checkbox" data-tick="${i.id}" ${i.done?'checked':''} aria-label="Done"><span class="num">${ii+1}</span>
      <input class="plitin" data-f="text" value="${esc(i.text)}" placeholder="What needs doing" maxlength="300" aria-label="Item ${ii+1}"><input class="plwho" data-f="who" value="${esc(i.who)}" placeholder="Who" maxlength="60" aria-label="Who is doing item ${ii+1}">
      <span class="byl small">${i.done&&i.by?'✓ '+esc(i.by):''}</span><span class="placts"><button type="button" class="iconb" data-a="iup" ${ii?'':'disabled'} aria-label="Move up">↑</button><button type="button" class="iconb del" data-a="idel" aria-label="Delete item">×</button></span></li>`).join('')}</ol>
-    <div class="pladd"><span class="num">${g.items.length+1}</span><input class="pladdin" placeholder="Add an item and press Enter" maxlength="300" aria-label="Add an item${g.title?' to '+esc(g.title):''}"><button type="button" class="btn sm ghost" data-a="iadd">Add</button></div></div>`).join('')}
+    <div class="pladd"><span class="num">${g.items.length+1}</span><input class="pladdin" placeholder="Add an item and press Enter, or paste a whole list" maxlength="300" aria-label="Add an item${g.title?' to '+esc(g.title):''}"><button type="button" class="btn sm ghost" data-a="iadd">Add</button></div></div>`).join('')}
    <button type="button" class="linkbtn" data-a="gadd">＋ Add subheading</button></section>`}).join('')
    :`<div class="plstart"><p><b>Plan everything that needs preparing.</b> Make categories (like <i>LED Wall Creatives</i>), add subheadings (like <i>Speakers Background</i>) and list the items under each. Tick them off as they're done, or share the list with your team.</p><button type="button" class="btn" data-a="tpl">Start with an example</button></div>`)+
    `<button type="button" class="btn ghost plnewcat" data-a="cadd">＋ Add category</button>`;
@@ -69,6 +71,38 @@ async function planView(e,tab0){
   save()});
  const addItem=grp=>{const inp=$('.pladdin',grp),v=inp.value.trim();if(!v){inp.focus();return}const {g}=find(grp.closest('[data-cat]').dataset.cat,grp.dataset.grp);
   g.items.push({id:plId(),text:v,who:'',done:false,by:'',t:0});save();drawLists(`[data-grp="${g.id}"] .pladdin`)};
+ /* paste a whole list (from WhatsApp, Word, Excel…): numbered or bulleted lines become items,
+    other lines become subheadings with the items below them; the old numbers are dropped */
+ body.addEventListener('paste',async ev=>{const t=ev.target;
+  if(!t.classList||!(t.classList.contains('pladdin')||t.id==='pa-title'))return;
+  const text=(ev.clipboardData||window.clipboardData).getData('text')||'';
+  const lines=text.split(/\r?\n/).map(l=>l.replace(/​/g,'').trim()).filter(Boolean);
+  if(lines.length<2)return;   // one line: paste normally
+  ev.preventDefault();
+  if(t.id==='pa-title'){   // program chart: one row per line, "… 10 min" at the end becomes the duration
+   const rows=lines.map(l=>{l=l.replace(PL_MARK,'').trim();const m=/[\s\-–—,|(]*(\d{1,3})\s*(?:min|mins|minutes|m)\.?\)?\s*$/i.exec(l);return {title:(m?l.slice(0,m.index):l).trim(),dur:m?+m[1]:0}}).filter(r=>r.title);
+   if(!rows.length)return;
+   if(!await confirmBox(`Add ${rows.length} program items?`,`One row for each line you pasted.${rows.some(r=>r.dur)?' Minutes at the end of a line were used as the duration.':' Add the minutes for each row afterwards.'}`,'Add'))return;
+   for(const r of rows)P.program.items.push({id:plId(),title:r.title.slice(0,160),dur:r.dur,who:'',note:''});save();drawProgram('#pa-title');toast(`${rows.length} program items added`);return}
+  const grp=t.closest('[data-grp]'),{c,g}=find(grp.closest('[data-cat]').dataset.cat,grp.dataset.grp);
+  const numbered=lines.filter(l=>PL_MARK.test(l)).length;
+  const blocks=[{title:null,items:[]}];
+  for(const l of lines){
+   if(!numbered||PL_MARK.test(l)){const x=l.replace(PL_MARK,'').trim();if(x)blocks[blocks.length-1].items.push(x)}
+   else blocks.push({title:l.replace(/[\s:;：]+$/,'').trim().slice(0,100),items:[]});
+  }
+  for(let i=blocks.length-1;i>0;i--)if(!blocks[i].items.length)blocks.splice(i,1);   // a heading with nothing under it (e.g. a title line)
+  if(!g.items.length&&!g.title&&!blocks[0].items.length&&blocks[1]){blocks[0]=blocks[1];blocks.splice(1,1);g.title=blocks[0].title}   // empty untitled group takes the first heading
+  const items=blocks.reduce((n,b)=>n+b.items.length,0),heads=blocks.slice(1).length;
+  if(!items&&!heads)return;
+  if(!await confirmBox(`Add ${items} item${items===1?'':'s'}${heads?` in ${heads+(blocks[0].items.length?1:0)} subheadings`:''}?`,
+   heads?`Lines without a number became subheadings: <b>${blocks.slice(1,4).map(b=>esc(b.title)).join('</b>, <b>')}</b>${heads>3?' …':''}. The numbers you pasted are replaced by the planner's own.`:'One item for each line you pasted. The numbers you pasted are replaced by the planner\'s own.','Add'))return;
+  const mk=x=>({id:plId(),text:x.slice(0,300),who:'',done:false,by:'',t:0});
+  g.items.push(...blocks[0].items.map(mk));
+  let at=c.groups.indexOf(g)+1;
+  for(const b of blocks.slice(1))c.groups.splice(at++,0,{id:plId(),title:b.title,items:b.items.map(mk)});
+  save();drawLists(`[data-grp="${g.id}"] .pladdin`);toast(`${items} item${items===1?'':'s'} added`);
+ });
  body.addEventListener('keydown',ev=>{const t=ev.target;if(ev.key!=='Enter'||t.tagName!=='INPUT')return;ev.preventDefault();
   if(t.classList.contains('pladdin'))addItem(t.closest('[data-grp]'));
   else if(t.classList.contains('prgaddin'))addRow();
@@ -102,7 +136,7 @@ async function planView(e,tab0){
   <div class="prgwrap"><table class="prgtab"><thead><tr><th>#</th><th>Time</th><th>Program item</th><th>Minutes</th><th>Person</th><th>Notes</th><th><span class="vh">Actions</span></th></tr></thead><tbody>
    ${items.map((it,n)=>`<tr data-row="${it.id}"><td class="n">${n+1}</td><td class="prgt"></td><td><input data-f="title" value="${esc(it.title)}" placeholder="e.g. National Anthem" maxlength="160" aria-label="Program item ${n+1}"></td><td><input class="dur" type="number" min="0" max="720" inputmode="numeric" data-f="dur" value="${it.dur||''}" aria-label="Minutes for item ${n+1}"></td><td><input data-f="who" value="${esc(it.who)}" placeholder="Speaker / person" maxlength="100" aria-label="Person for item ${n+1}"></td><td><input data-f="note" value="${esc(it.note)}" placeholder="Notes" maxlength="200" aria-label="Notes for item ${n+1}"></td>
     <td class="acts"><button type="button" class="iconb" data-a="rup" ${n?'':'disabled'} aria-label="Move up">↑</button><button type="button" class="iconb" data-a="rdown" ${n<items.length-1?'':'disabled'} aria-label="Move down">↓</button><button type="button" class="iconb del" data-a="rdel" aria-label="Delete item">×</button></td></tr>`).join('')}
-   <tr class="prgadd"><td class="n">${items.length+1}</td><td></td><td><input class="prgaddin" id="pa-title" placeholder="Add a program item" maxlength="160" aria-label="New program item"></td><td><input class="dur prgaddin" id="pa-dur" type="number" min="0" max="720" inputmode="numeric" placeholder="min" aria-label="Minutes"></td><td><input class="prgaddin" id="pa-who" placeholder="Speaker / person" maxlength="100" aria-label="Person"></td><td colspan="2"><button type="button" class="btn sm" data-a="radd">Add</button></td></tr>
+   <tr class="prgadd"><td class="n">${items.length+1}</td><td></td><td><input class="prgaddin" id="pa-title" placeholder="Add a program item, or paste a list" maxlength="160" aria-label="New program item"></td><td><input class="dur prgaddin" id="pa-dur" type="number" min="0" max="720" inputmode="numeric" placeholder="min" aria-label="Minutes"></td><td><input class="prgaddin" id="pa-who" placeholder="Speaker / person" maxlength="100" aria-label="Person"></td><td colspan="2"><button type="button" class="btn sm" data-a="radd">Add</button></td></tr>
   </tbody></table></div><p class="prgtot"></p>
   ${items.length?'':`<div class="plstart"><p>Not sure where to start? Add a typical running order, then change the names and minutes.</p><button type="button" class="btn ghost" data-a="rtpl">Add example program</button></div>`}`;
   progTimes();if(focus){const el=$(focus,body);if(el)el.focus()}
