@@ -8,7 +8,9 @@ const PL_START=[
 ];
 const PL_PROG=[['National Anthem',2],['Welcome Speech',10],['Presidential Address',10],['Inauguration',15],['Chief Guest Address',20],['Award Presentation',20],['Vote of Thanks',5]];
 // list markers at the start of a pasted line: 1.  1)  (1)  1 -  -  •  *  a)
-const PL_MARK=/^\s*(?:\(?\d{1,3}\s*[.)\]:：-]|\(\d{1,3}\)|\d{1,3}\s+[-–]|[-–•*·●▪◦➤►✓✔]|[a-z][.)](?=\s))\s*/i;
+const PL_MARK=/^\s*(?:\(?\d{1,3}\s*[.)\]:：-](?!\d)|\(\d{1,3}\)|\d{1,3}\s+[-–]|[-–•*·●▪◦➤►✓✔]|[a-z]\)(?=\s))\s*/i;   // not "C.": initials like C. H. Muhammed Koya stay
+// a clock time (or time range) at the start of a program line: 6:00 PM, 6:30 – 7:30 PM, 18.30
+const PL_TIME=/^\d{1,2}[:.]\d{2}\s*(?:[ap]\.?m\.?)?(?:\s*[-–—to]+\s*\d{1,2}[:.]\d{2}\s*(?:[ap]\.?m\.?)?)?\s*[-–—:|]?\s*/i;
 const plId=()=>Math.random().toString(36).slice(2,10).padEnd(8,'0');
 
 async function planView(e,tab0){
@@ -80,10 +82,12 @@ async function planView(e,tab0){
   if(lines.length<2)return;   // one line: paste normally
   ev.preventDefault();
   if(t.id==='pa-title'){   // program chart: one row per line, "… 10 min" at the end becomes the duration
-   const rows=lines.map(l=>{l=l.replace(PL_MARK,'').trim();const m=/[\s\-–—,|(]*(\d{1,3})\s*(?:min|mins|minutes|m)\.?\)?\s*$/i.exec(l);return {title:(m?l.slice(0,m.index):l).trim(),dur:m?+m[1]:0}}).filter(r=>r.title);
+   // a line can be "Title | Person | Notes | 10 min" (person, notes and minutes are optional)
+   const rows=lines.map(l=>{l=l.replace(PL_MARK,'').replace(PL_TIME,'').trim();const m=/[\s\-–—,|(]*(\d{1,3})\s*(?:min|mins|minutes|m)\.?\)?\s*$/i.exec(l);
+    const [title,who,...note]=(m?l.slice(0,m.index):l).split('|').map(x=>x.trim());return {title,who:who||'',note:note.filter(Boolean).join(' · '),dur:m?+m[1]:0}}).filter(r=>r.title);
    if(!rows.length)return;
    if(!await confirmBox(`Add ${rows.length} program items?`,`One row for each line you pasted.${rows.some(r=>r.dur)?' Minutes at the end of a line were used as the duration.':' Add the minutes for each row afterwards.'}`,'Add'))return;
-   for(const r of rows)P.program.items.push({id:plId(),title:r.title.slice(0,160),dur:r.dur,who:'',note:''});save();drawProgram('#pa-title');toast(`${rows.length} program items added`);return}
+   for(const r of rows)P.program.items.push({id:plId(),title:r.title.slice(0,160),dur:r.dur,who:r.who.slice(0,100),note:r.note.slice(0,200)});save();drawProgram('#pa-title');toast(`${rows.length} program items added`);return}
   const grp=t.closest('[data-grp]'),{c,g}=find(grp.closest('[data-cat]').dataset.cat,grp.dataset.grp);
   const numbered=lines.filter(l=>PL_MARK.test(l)).length;
   const blocks=[{title:null,items:[]}];
