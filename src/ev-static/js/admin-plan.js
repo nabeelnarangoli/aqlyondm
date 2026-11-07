@@ -44,13 +44,13 @@ async function planView(e,tab0){
  function drawLists(focus){
   const L=P.checklists;
   body.innerHTML=(L.length?L.map((c,ci)=>{const k=PV.count([c]);return `<section class="plcat" data-cat="${c.id}">
-   <div class="plcathead"><input class="plcatin" data-f="ctitle" value="${esc(c.title)}" placeholder="Category, e.g. LED Wall Creatives" maxlength="100" aria-label="Category name">
+   <div class="plcathead"><button type="button" class="dragh" data-drag="cat" aria-label="Drag to move this category" title="Drag to move">⠿</button><input class="plcatin" data-f="ctitle" value="${esc(c.title)}" placeholder="Category, e.g. LED Wall Creatives" maxlength="100" aria-label="Category name">
     <span class="plpill ${k.n&&k.d===k.n?'all':''}">${k.d} / ${k.n} done</span>
     <span class="placts"><button type="button" class="iconb" data-a="cup" ${ci?'':'disabled'} aria-label="Move category up">↑</button><button type="button" class="iconb" data-a="cdown" ${ci<L.length-1?'':'disabled'} aria-label="Move category down">↓</button><button type="button" class="iconb del" data-a="cdel" aria-label="Delete category">🗑</button></span>
     <div class="plbar"><i style="width:${PV.pct(k)}%"></i></div></div>
-   ${c.groups.map((g,gi)=>`<div class="plgrp" data-grp="${g.id}"><div class="plgrphead"><input class="plgrpin" data-f="gtitle" value="${esc(g.title)}" placeholder="Subheading, e.g. Speakers Background (optional)" maxlength="100" aria-label="Subheading">
+   ${c.groups.map((g,gi)=>`<div class="plgrp" data-grp="${g.id}"><div class="plgrphead"><button type="button" class="dragh" data-drag="grp" aria-label="Drag to move this subheading" title="Drag to move">⠿</button><input class="plgrpin" data-f="gtitle" value="${esc(g.title)}" placeholder="Subheading, e.g. Speakers Background (optional)" maxlength="100" aria-label="Subheading">
      <span class="placts"><button type="button" class="iconb" data-a="gup" ${gi?'':'disabled'} aria-label="Move subheading up">↑</button><button type="button" class="iconb del" data-a="gdel" aria-label="Delete subheading">🗑</button></span></div>
-    <ol class="plitems">${g.items.map((i,ii)=>`<li class="${i.done?'done':''}" data-item="${i.id}"><input type="checkbox" data-tick="${i.id}" ${i.done?'checked':''} aria-label="Done"><span class="num">${ii+1}</span>
+    <ol class="plitems">${g.items.map((i,ii)=>`<li class="${i.done?'done':''}" data-item="${i.id}"><button type="button" class="dragh" data-drag="item" aria-label="Drag to move this item" title="Drag to move">⠿</button><input type="checkbox" data-tick="${i.id}" ${i.done?'checked':''} aria-label="Done"><span class="num">${ii+1}</span>
      <input class="plitin" data-f="text" value="${esc(i.text)}" placeholder="What needs doing" maxlength="300" aria-label="Item ${ii+1}"><input class="plwho" data-f="who" value="${esc(i.who)}" placeholder="Who" maxlength="60" aria-label="Who is doing item ${ii+1}">
      <span class="byl small">${i.done&&i.by?'✓ '+esc(i.by):''}</span><span class="placts"><button type="button" class="iconb" data-a="iup" ${ii?'':'disabled'} aria-label="Move up">↑</button><button type="button" class="iconb del" data-a="idel" aria-label="Delete item">×</button></span></li>`).join('')}</ol>
     <div class="pladd"><span class="num">${g.items.length+1}</span><input class="pladdin" placeholder="Add an item and press Enter, or paste a whole list" maxlength="300" aria-label="Add an item${g.title?' to '+esc(g.title):''}"><button type="button" class="btn sm ghost" data-a="iadd">Add</button></div></div>`).join('')}
@@ -127,6 +127,44 @@ async function planView(e,tab0){
   if(a==='rdel'){items.splice(ri,1);save();drawProgram();return}
  });
 
+ /* ---------- drag and drop (mouse and touch): categories, subheadings (also into another category),
+    items (also into another subheading) and program rows. The page is rearranged while you drag;
+    when you let go, the new order is read back from the page and saved. ---------- */
+ let drag=null;
+ const below=(t,y)=>{const r=t.getBoundingClientRect();return y>r.top+r.height/2};
+ const byY=(list,y,end)=>{for(const t of list){if(t===el2())continue;const r=t.getBoundingClientRect();if(y<r.top+r.height/2)return t}return end};
+ const el2=()=>drag&&drag.el;
+ const place=()=>{const {kind,el,x,y}=drag;
+  // categories and program rows follow the pointer's height, so they still move while the page scrolls under a sticky header
+  if(kind==='cat'){const t=byY($$('.plcat',body),y,$('.plnewcat',body));if(t&&t!==el&&t.previousElementSibling!==el)body.insertBefore(el,t);else if(t!==el&&t===$('.plnewcat',body)&&el.nextElementSibling!==t)body.insertBefore(el,t);return}
+  if(kind==='row'){const tb=el.parentNode,t=byY($$('tr[data-row]',tb),y,$('.prgadd',tb));if(t&&t!==el&&el.nextElementSibling!==t)tb.insertBefore(el,t);return}
+  let hit=document.elementFromPoint(x,y),yy=y;while((!hit||!body.contains(hit))&&yy<y+240){yy+=20;hit=document.elementFromPoint(x,yy)}   // look past a sticky header
+  if(!hit||!body.contains(hit))return;
+  if(kind==='item'){const li=hit.closest('li[data-item]');if(li&&li!==el){if(li.closest('[data-grp]'))li.parentNode.insertBefore(el,below(li,y)?li.nextSibling:li);return}
+   const g=hit.closest('.plgrp');if(g&&!li){const ol=$('.plitems',g);if(el.parentNode!==ol){if(y<ol.getBoundingClientRect().top)ol.insertBefore(el,ol.firstChild);else ol.appendChild(el)}}return}
+  if(kind==='grp'){const g=hit.closest('.plgrp');if(g&&g!==el){g.parentNode.insertBefore(el,below(g,y)?g.nextSibling:g);return}
+   const c=hit.closest('.plcat');if(c&&!g&&el.parentNode!==c){const gs=$$('.plgrp',c);if(gs.length&&y<gs[0].getBoundingClientRect().top)c.insertBefore(el,gs[0]);else c.insertBefore(el,$('[data-a=gadd]',c))}return}
+  };
+ const commit=(kind,before)=>{
+  if(kind==='row'){const ids=$$('tr[data-row]',body).map(r=>r.dataset.row);P.program.items.sort((a,b)=>ids.indexOf(a.id)-ids.indexOf(b.id))}
+  else{const I=new Map(),G=new Map(),C=new Map();
+   for(const c of P.checklists){C.set(c.id,c);for(const g of c.groups){G.set(g.id,g);for(const i of g.items)I.set(i.id,i)}}
+   P.checklists=$$('.plcat',body).map(ce=>{const c=C.get(ce.dataset.cat);if(c)c.groups=$$('.plgrp',ce).map(ge=>{const g=G.get(ge.dataset.grp);if(g)g.items=$$('li[data-item]',ge).map(li=>I.get(li.dataset.item)).filter(Boolean);return g}).filter(Boolean);return c}).filter(Boolean)}
+  const after=JSON.stringify(kind==='row'?P.program.items.map(i=>i.id):P.checklists.map(c=>[c.id,c.groups.map(g=>[g.id,g.items.map(i=>i.id)])]));
+  if(after!==before)save();kind==='row'?drawProgram():drawLists()};
+ body.addEventListener('pointerdown',ev=>{const h=ev.target.closest('[data-drag]');if(!h||ev.button>0)return;
+  const kind=h.dataset.drag,el=h.closest({item:'li[data-item]',grp:'.plgrp',cat:'.plcat',row:'tr[data-row]'}[kind]);if(!el)return;
+  ev.preventDefault();if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
+  const before=JSON.stringify(kind==='row'?P.program.items.map(i=>i.id):P.checklists.map(c=>[c.id,c.groups.map(g=>[g.id,g.items.map(i=>i.id)])]));
+  drag={kind,el,x:ev.clientX,y:ev.clientY,raf:0};el.classList.add('dragging');body.classList.add('pldrag','pldrag-'+kind);
+  const mv=e=>{if(!drag)return;e.preventDefault();drag.x=e.clientX;drag.y=e.clientY;place()};
+  const tick=()=>{if(!drag)return;const m=70,sp=drag.y<m?-14:drag.y>innerHeight-m?14:0;if(sp){scrollBy(0,sp);place()}drag.raf=requestAnimationFrame(tick)};drag.raf=requestAnimationFrame(tick);
+  // listen on the whole page: moving the element in the page would drop a pointer capture on the handle
+  const up=()=>{document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up);document.removeEventListener('pointercancel',up);
+   cancelAnimationFrame(drag.raf);el.classList.remove('dragging');body.classList.remove('pldrag','pldrag-'+kind);drag=null;commit(kind,before)};
+  document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up);document.addEventListener('pointercancel',up);
+ });
+
  /* ---------- program chart ---------- */
  const progTimes=()=>{const T=PV.times(P.program);P.program.items.forEach((it,n)=>{const c=body.querySelector(`[data-row="${it.id}"] .prgt`);if(c)c.innerHTML=T[n].from?`<b>${T[n].from}</b><small>to ${T[n].to}</small>`:`<b>–</b>`});
   const tot=PV.total(P.program),f=$('.prgtot',body);if(f)f.textContent=`${P.program.items.length} item${P.program.items.length===1?'':'s'} · total ${PV.dur(tot)}${P.program.start?` · ends at ${PV.clock(PV.toMin(P.program.start)+tot)}`:''}`};
@@ -134,7 +172,7 @@ async function planView(e,tab0){
   const items=P.program.items;
   body.innerHTML=`<div class="prghead"><label class="prgstart">Program starts at <input type="time" data-f="start" value="${esc(P.program.start)}"></label><p class="small" style="margin:0">Add each item with how many minutes it takes. Times are worked out for you, and change when you reorder or edit.</p></div>
   <div class="prgwrap"><table class="prgtab"><thead><tr><th>#</th><th>Time</th><th>Program item</th><th>Minutes</th><th>Person</th><th>Notes</th><th><span class="vh">Actions</span></th></tr></thead><tbody>
-   ${items.map((it,n)=>`<tr data-row="${it.id}"><td class="n">${n+1}</td><td class="prgt"></td><td><input data-f="title" value="${esc(it.title)}" placeholder="e.g. National Anthem" maxlength="160" aria-label="Program item ${n+1}"></td><td><input class="dur" type="number" min="0" max="720" inputmode="numeric" data-f="dur" value="${it.dur||''}" aria-label="Minutes for item ${n+1}"></td><td><input data-f="who" value="${esc(it.who)}" placeholder="Speaker / person" maxlength="100" aria-label="Person for item ${n+1}"></td><td><input data-f="note" value="${esc(it.note)}" placeholder="Notes" maxlength="200" aria-label="Notes for item ${n+1}"></td>
+   ${items.map((it,n)=>`<tr data-row="${it.id}"><td class="n"><button type="button" class="dragh" data-drag="row" aria-label="Drag to move this program item" title="Drag to move">⠿</button><span>${n+1}</span></td><td class="prgt"></td><td><input data-f="title" value="${esc(it.title)}" placeholder="e.g. National Anthem" maxlength="160" aria-label="Program item ${n+1}"></td><td><input class="dur" type="number" min="0" max="720" inputmode="numeric" data-f="dur" value="${it.dur||''}" aria-label="Minutes for item ${n+1}"></td><td><input data-f="who" value="${esc(it.who)}" placeholder="Speaker / person" maxlength="100" aria-label="Person for item ${n+1}"></td><td><input data-f="note" value="${esc(it.note)}" placeholder="Notes" maxlength="200" aria-label="Notes for item ${n+1}"></td>
     <td class="acts"><button type="button" class="iconb" data-a="rup" ${n?'':'disabled'} aria-label="Move up">↑</button><button type="button" class="iconb" data-a="rdown" ${n<items.length-1?'':'disabled'} aria-label="Move down">↓</button><button type="button" class="iconb del" data-a="rdel" aria-label="Delete item">×</button></td></tr>`).join('')}
    <tr class="prgadd"><td class="n">${items.length+1}</td><td></td><td><input class="prgaddin" id="pa-title" placeholder="Add a program item, or paste a list" maxlength="160" aria-label="New program item"></td><td><input class="dur prgaddin" id="pa-dur" type="number" min="0" max="720" inputmode="numeric" placeholder="min" aria-label="Minutes"></td><td><input class="prgaddin" id="pa-who" placeholder="Speaker / person" maxlength="100" aria-label="Person"></td><td colspan="2"><button type="button" class="btn sm" data-a="radd">Add</button></td></tr>
   </tbody></table></div><p class="prgtot"></p>

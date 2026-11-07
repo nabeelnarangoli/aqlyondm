@@ -385,7 +385,7 @@ button.ckrow{cursor:pointer}.ckrow small{display:block;color:var(--muted);font-s
 .plshared{font-weight:700;color:var(--accent,#3B3FA8)}
 .plbody{margin-top:14px}
 .plcat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px 12px;margin-bottom:14px}
-.plcathead{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px 10px;align-items:center}
+.plcathead{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:8px 10px;align-items:center}
 .plcathead .plbar{grid-column:1/-1}
 .plcatin,.plgrpin,.plitin,.plwho,.pladdin,.prgtab input,.prgstart input{font:inherit;border:2px solid transparent;border-radius:10px;padding:7px 10px;background:transparent;color:var(--ink);min-width:0;width:100%}
 .plcatin{font:700 21px var(--display,inherit);padding:6px 10px}
@@ -393,16 +393,16 @@ button.ckrow{cursor:pointer}.ckrow small{display:block;color:var(--muted);font-s
 .plcatin:hover,.plgrpin:hover,.plitin:hover,.plwho:hover,.prgtab input:hover{border-color:var(--line)}
 .plcatin:focus,.plgrpin:focus,.plitin:focus,.plwho:focus,.pladdin:focus,.prgtab input:focus,.prgstart input:focus{outline:none;border-color:var(--accent,#5B4CE0);background:var(--surface,#fff)}
 .plgrp{margin-top:10px;padding-left:8px;border-left:3px solid var(--line,#E7E9F6)}
-.plgrphead{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+.plgrphead{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center}
 .plitems{list-style:none;margin:2px 0 0;padding:0}
-.plitems li{display:grid;grid-template-columns:24px 22px minmax(0,1fr) 140px auto auto;gap:6px;align-items:center;padding:2px 0}
+.plitems li{display:grid;grid-template-columns:22px 24px 22px minmax(0,1fr) 140px auto auto;gap:6px;align-items:center;padding:2px 0}
 .plitems li input[type=checkbox]{width:22px;height:22px;accent-color:#22AD72;margin:0;cursor:pointer}
 .plitems li.done .plitin{text-decoration:line-through;color:var(--muted,#6A7090)}
 .plitems .num,.pladd .num{font-weight:700;color:var(--muted,#6A7090);text-align:right;font-variant-numeric:tabular-nums}
 .plwho{font-size:14px}
 .byl{color:var(--good,#0B6B43);font-weight:700;white-space:nowrap}
-.pladd{display:grid;grid-template-columns:24px 22px minmax(0,1fr) auto;gap:6px;align-items:center;margin:4px 0 6px}
-.pladd .num{grid-column:2}
+.pladd{display:grid;grid-template-columns:22px 24px 22px minmax(0,1fr) auto;gap:6px;align-items:center;margin:4px 0 6px}
+.pladd .num{grid-column:3}
 .pladdin{border:2px dashed var(--line)!important;background:var(--surface,#fff)!important}
 .placts{display:flex;gap:2px;white-space:nowrap}
 .iconb{border:0;background:none;min-width:34px;height:34px;border-radius:9px;cursor:pointer;font-size:16px;color:var(--muted,#5A6075)}
@@ -429,13 +429,13 @@ button.ckrow{cursor:pointer}.ckrow small{display:block;color:var(--muted);font-s
 .prgtot{font-weight:700;margin:10px 4px}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media (max-width:700px){
- .plitems li{grid-template-columns:22px 20px minmax(0,1fr) auto;row-gap:0}
- .plitems li .plwho{grid-column:3;font-size:13px;padding-top:0}
- .plitems li .byl{grid-column:3}
- .plitems li .placts{grid-row:1;grid-column:4}
- .plcathead{grid-template-columns:minmax(0,1fr) auto}
- .plcathead .plpill{grid-row:2;justify-self:start;margin-left:10px}
- .plcathead .placts{grid-row:1;grid-column:2}
+ .plitems li{grid-template-columns:20px 22px 20px minmax(0,1fr) auto;row-gap:0}
+ .plitems li .plwho{grid-column:4;font-size:13px;padding-top:0}
+ .plitems li .byl{grid-column:4}
+ .plitems li .placts{grid-row:1;grid-column:5}
+ .plcathead{grid-template-columns:auto minmax(0,1fr) auto}
+ .plcathead .plpill{grid-row:2;grid-column:2;justify-self:start;margin-left:10px}
+ .plcathead .placts{grid-row:1;grid-column:3}
 }
 .plview{margin-top:14px}.plme{max-width:420px;margin:0 0 12px}.plme input.need{border-color:#D93A3F}
 .plorg{display:flex;align-items:center;gap:10px;border:1px dashed var(--line);background:var(--surface);border-radius:14px;padding:6px 12px 6px 6px;cursor:pointer;color:var(--ink);font:inherit;text-align:left;min-height:56px}
@@ -447,3 +447,14 @@ button.ckrow{cursor:pointer}.ckrow small{display:block;color:var(--muted);font-s
 .plhead .pltop{flex:1;min-width:200px}
 .polprev img{object-fit:contain!important;background:repeating-conic-gradient(var(--soft) 0 25%,transparent 0 50%) 0 0/16px 16px}
 .plkind{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:6px 0 12px}.plkind h2{margin:0;font-size:22px}
+/* drag and drop */
+.dragh{border:0;background:none;color:var(--muted);font-size:17px;line-height:1;width:22px;height:34px;padding:0;border-radius:7px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.dragh:hover{background:var(--soft);color:var(--ink)}
+.dragh:active{cursor:grabbing}
+.pldrag,.pldrag *{cursor:grabbing!important;user-select:none;-webkit-user-select:none}
+.dragging{opacity:.9;outline:2px solid var(--accent,#5B4CE0);outline-offset:2px;border-radius:12px;background:var(--surface);box-shadow:0 16px 34px -14px rgba(0,0,0,.45);position:relative;z-index:3;pointer-events:none}
+.pldrag-item .plitems{min-height:34px;border-radius:10px;outline:1px dashed var(--line);outline-offset:2px}
+.pldrag-grp .plcat{outline:1px dashed var(--line);outline-offset:4px}
+.prgtab td.n{white-space:nowrap}.prgtab td.n .dragh{vertical-align:middle;margin-right:2px}.prgtab td.n{width:52px}
+tr.dragging td{background:var(--surface)}
+@media (max-width:700px){.plbody [data-a=cup],.plbody [data-a=cdown],.plbody [data-a=gup],.plbody [data-a=iup],.plbody [data-a=rup],.plbody [data-a=rdown]{display:none}}
