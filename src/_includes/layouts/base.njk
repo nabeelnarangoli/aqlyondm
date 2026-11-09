@@ -28,6 +28,10 @@
 <link rel="stylesheet" href="/assets/css/site.css?v={{ build.v }}">
 {% if eventsModule %}<link rel="stylesheet" href="/site/events.css?v={{ build.v }}">{% endif %}
 {% include "partials/schema.njk" %}
+<script>/* a picture that fails to load: blog cards show the Aqlyon mark, other pictures are hidden instead of showing a broken icon */
+document.addEventListener("error",function(e){var i=e.target;if(!i||i.tagName!=="IMG"||i.getAttribute("data-fb"))return;i.setAttribute("data-fb","1");
+if(i.closest(".post-card .cover")){i.src="/assets/img/aqlyon-q.png";i.className="q";return}
+var f=i.closest(".post-hero")||i.closest("figure")||(i.parentNode&&i.parentNode.tagName==="P"&&i.parentNode.textContent.trim()===""?i.parentNode:null);(f||i).style.display="none"},true);</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
